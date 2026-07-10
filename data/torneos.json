@@ -1,13 +1,5 @@
 [
   {
-    "nombre": "Liga Comunitaria Doubles",
-    "status": "proximo",
-    "formato": "doubles",
-    "fechas": "12 ago 2026",
-    "descripcion": "Torneo organizado por la comunidad, formato Doubles 4v4, inscripción abierta.",
-    "link": "#"
-  },
-  {
     "nombre": "Showdown Singles Semanal",
     "status": "proximo",
     "formato": "singles",
