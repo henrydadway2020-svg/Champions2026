@@ -1,13 +1,5 @@
 [
   {
-    "nombre": "Copa Champions M-4",
-    "status": "live",
-    "formato": "ambos",
-    "fechas": "08 jul – 05 ago 2026",
-    "descripcion": "Torneo oficial de temporada, ranking Singles y Doubles por separado.",
-    "link": "#"
-  },
-  {
     "nombre": "Liga Comunitaria Doubles",
     "status": "proximo",
     "formato": "doubles",
