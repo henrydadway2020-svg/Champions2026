@@ -1,0 +1,26 @@
+[
+  {
+    "nombre": "Copa Champions M-4",
+    "status": "live",
+    "formato": "ambos",
+    "fechas": "08 jul – 05 ago 2026",
+    "descripcion": "Torneo oficial de temporada, ranking Singles y Doubles por separado.",
+    "link": "#"
+  },
+  {
+    "nombre": "Liga Comunitaria Doubles",
+    "status": "proximo",
+    "formato": "doubles",
+    "fechas": "12 ago 2026",
+    "descripcion": "Torneo organizado por la comunidad, formato Doubles 4v4, inscripción abierta.",
+    "link": "#"
+  },
+  {
+    "nombre": "Showdown Singles Semanal",
+    "status": "proximo",
+    "formato": "singles",
+    "fechas": "Todos los sábados",
+    "descripcion": "Torneo casual semanal 3v3, ideal para probar equipos nuevos antes del ranked.",
+    "link": "#"
+  }
+]

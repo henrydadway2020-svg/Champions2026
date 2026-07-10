@@ -1,0 +1,39 @@
+{
+  "singles": {
+    "S": [
+      { "nombre": "Hippowdon", "dex": 450, "nota": "Bulk + hazards + Slack Off" },
+      { "nombre": "Garchomp", "dex": 445, "nota": "Ataque físico alto, gran velocidad" }
+    ],
+    "A": [
+      { "nombre": "Dragapult", "dex": 887, "nota": "Sweeper rápido, gran coverage" },
+      { "nombre": "Gholdengo", "dex": 1000, "nota": "Bulk especial + Recover" },
+      { "nombre": "Urshifu", "dex": 892, "nota": "Rompe estructuras defensivas" }
+    ],
+    "B": [
+      { "nombre": "Hydreigon", "dex": 635, "nota": "Coverage especial versátil" },
+      { "nombre": "Mimikyu", "dex": 778, "nota": "Disguise entra gratis" }
+    ],
+    "C": [
+      { "nombre": "Ting-Lu", "dex": 1024, "nota": "Muro físico con hazards" }
+    ]
+  },
+  "doubles": {
+    "S": [
+      { "nombre": "Incineroar", "dex": 727, "nota": "Intimidate + Fake Out, soporte S-tier" },
+      { "nombre": "Rillaboom", "dex": 812, "nota": "Grassy Terrain + prioridad" }
+    ],
+    "A": [
+      { "nombre": "Kingambit", "dex": 983, "nota": "Defiant + Sucker Punch, castiga Intimidate" },
+      { "nombre": "Amoonguss", "dex": 591, "nota": "Redirección con Rage Powder" },
+      { "nombre": "Flutter Mane", "dex": 987, "nota": "Velocidad + Moonblast especial" }
+    ],
+    "B": [
+      { "nombre": "Pelipper", "dex": 279, "nota": "Setter de lluvia, Drizzle" },
+      { "nombre": "Torkoal", "dex": 324, "nota": "Setter de sol, Drought" },
+      { "nombre": "Iron Hands", "dex": 992, "nota": "Bulk físico + Fake Out" }
+    ],
+    "C": [
+      { "nombre": "Tornadus", "dex": 641, "nota": "Tailwind support, Prankster" }
+    ]
+  }
+}

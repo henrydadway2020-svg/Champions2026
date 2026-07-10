@@ -1,0 +1,48 @@
+{
+  "singles": [
+    {
+      "nombre": "Hazard Stack",
+      "arquetipo": "Stall / hazards",
+      "estrategia": "Hippowdon pone Stealth Rock y desgasta con Sand; Garchomp remata lo que quede debilitado.",
+      "mons": [
+        { "nombre": "Hippowdon", "dex": 450, "item": "Leftovers", "nota": "Stealth Rock + Slack Off" },
+        { "nombre": "Garchomp", "dex": 445, "item": "Choice Scarf", "nota": "Revenge kill / cierre" },
+        { "nombre": "Gholdengo", "dex": 1000, "item": "Air Balloon", "nota": "Muro especial, Recover" }
+      ]
+    },
+    {
+      "nombre": "Speed Sweep",
+      "arquetipo": "Ofensivo rápido",
+      "estrategia": "Dragapult presiona desde el inicio; Urshifu limpia estructuras defensivas rivales.",
+      "mons": [
+        { "nombre": "Dragapult", "dex": 887, "item": "Choice Specs", "nota": "Coverage especial, mueve primero" },
+        { "nombre": "Urshifu", "dex": 892, "item": "Focus Sash", "nota": "Rompedor de muros" },
+        { "nombre": "Mimikyu", "dex": 778, "item": "Life Orb", "nota": "Disguise como escudo gratis" }
+      ]
+    }
+  ],
+  "doubles": [
+    {
+      "nombre": "Sun Offense",
+      "arquetipo": "Clima / ofensivo",
+      "estrategia": "Torkoal activa sol para potenciar ataques de fuego; Incineroar controla el ritmo con Fake Out e Intimidate.",
+      "mons": [
+        { "nombre": "Torkoal", "dex": 324, "item": "Charcoal", "nota": "Drought, setter de sol" },
+        { "nombre": "Incineroar", "dex": 727, "item": "Sitrus Berry", "nota": "Fake Out + Intimidate" },
+        { "nombre": "Iron Hands", "dex": 992, "item": "Assault Vest", "nota": "Bulk físico, Fake Out" },
+        { "nombre": "Flutter Mane", "dex": 987, "item": "Focus Sash", "nota": "Sweeper especial rápido" }
+      ]
+    },
+    {
+      "nombre": "Grassy Terrain",
+      "arquetipo": "Terreno / control",
+      "estrategia": "Rillaboom pone terreno de hierba para curar y potenciar; Amoonguss redirige ataques para proteger al equipo.",
+      "mons": [
+        { "nombre": "Rillaboom", "dex": 812, "item": "Assault Vest", "nota": "Grassy Terrain + Grassy Glide" },
+        { "nombre": "Amoonguss", "dex": 591, "item": "Rocky Helmet", "nota": "Rage Powder, redirección" },
+        { "nombre": "Kingambit", "dex": 983, "item": "Black Glasses", "nota": "Sucker Punch prioridad" },
+        { "nombre": "Pelipper", "dex": 279, "item": "Damp Rock", "nota": "Setter de lluvia secundario" }
+      ]
+    }
+  ]
+}

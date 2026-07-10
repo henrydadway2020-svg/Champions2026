@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Champions Hub · Torneos, Tier List, Pokédex y Equipos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="nav">
+  <div class="nav-inner">
+    <div class="brand"><span class="dot"></span> Champions Hub</div>
+    <nav class="links">
+      <a href="#torneos">Torneos</a>
+      <a href="#tierlist">Tier List</a>
+      <a href="#pokedex">Pokédex</a>
+      <a href="#equipos">Equipos</a>
+    </nav>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="wrap">
+    <div class="hero-badge">Temporada actual</div>
+    <h1>Todo el <span>meta</span><br>de Pokémon Champions</h1>
+    <p class="lead">Torneos vigentes, tier list de Singles y Doubles, la Pokédex completa con la mejor forma de equipar a cada Pokémon, y equipos armados.</p>
+    <div class="hero-actions">
+      <a href="#torneos" class="btn btn--primary">Ver torneos</a>
+      <a href="#pokedex" class="btn btn--ghost">Ver Pokédex</a>
+    </div>
+  </div>
+  <div class="ticker">
+    <div class="wrap">
+      <div class="ticker-track" id="tickerTrack"></div>
+    </div>
+  </div>
+</section>
+
+<section id="torneos">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <span class="eyebrow">Comunidad</span>
+        <h2>Torneos vigentes</h2>
+      </div>
+    </div>
+    <div class="tourney-grid" id="tourneyGrid"></div>
+  </div>
+</section>
+
+<section id="tierlist">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <span class="eyebrow">Meta actual</span>
+        <h2>Tier list</h2>
+      </div>
+      <div class="section-actions">
+        <div class="switch" data-group="tier">
+          <button data-fmt="singles" class="active">Singles</button>
+          <button data-fmt="doubles">Doubles</button>
+        </div>
+      </div>
+    </div>
+    <div id="tierListContainer"></div>
+  </div>
+</section>
+
+<section id="pokedex">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <span class="eyebrow">Base de datos</span>
+        <h2>Pokédex Champions</h2>
+      </div>
+      <div class="pokedex-stats" id="pokedexStats"></div>
+    </div>
+    <div class="pokedex-toolbar">
+      <input type="text" class="pokedex-search" id="pokedexSearch" placeholder="Buscar Pokémon por nombre...">
+    </div>
+    <div class="pokedex-grid" id="pokedexGrid"></div>
+    <div class="pokedex-empty" id="pokedexEmpty" style="display:none;">No se encontró ningún Pokémon con ese nombre.</div>
+  </div>
+</section>
+
+<section id="equipos">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <span class="eyebrow">Team building</span>
+        <h2>Equipos armados</h2>
+      </div>
+      <div class="switch" data-group="teams">
+        <button data-fmt="singles" class="active">Singles</button>
+        <button data-fmt="doubles">Doubles</button>
+      </div>
+    </div>
+    <div class="team-grid" id="teamGrid"></div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap footer-inner">
+    <p>Champions Hub · el contenido se administra desde un panel privado y se guarda en GitHub.</p>
+    <p class="note">Última actualización: <span id="lastUpdate">—</span> — esta página es de solo lectura. Todos los cambios los hace el administrador desde el panel de edición.</p>
+  </div>
+</footer>
+
+<div class="modal-overlay" id="modalOverlay" onclick="if(event.target===this) closeModal()">
+  <div class="modal-box" id="modalBox">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div id="modalContent"></div>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   Esta página SOLO LEE datos. No hay forma de editar nada desde
+   aquí — la edición vive en admin.html y requiere credenciales
+   de GitHub que solo tiene el administrador del sitio.
+   ============================================================ */
+
+let TORNEOS = [];
+let TIERS = {};
+let EQUIPOS = {};
+let POKEDEX_SPECIES = [];
+let POKEDEX_BUILDS = {};
+
+let currentTierFmt = 'singles';
+let currentTeamFmt = 'singles';
+
+const SPRITE_BASE = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/";
+const sprite = dex => `${SPRITE_BASE}${dex}.png`;
+
+async function loadJSON(path){
+  const res = await fetch(path + '?t=' + Date.now()); // evita caché vieja del navegador
+  if(!res.ok) throw new Error('No se pudo cargar ' + path);
+  return res.json();
+}
+
+async function loadAllData(){
+  try{
+    [TORNEOS, TIERS, EQUIPOS, POKEDEX_SPECIES, POKEDEX_BUILDS] = await Promise.all([
+      loadJSON('data/torneos.json'),
+      loadJSON('data/tiers.json'),
+      loadJSON('data/equipos.json'),
+      loadJSON('data/pokedex_species.json'),
+      loadJSON('data/pokedex_builds.json')
+    ]);
+  }catch(e){
+    console.error(e);
+    document.querySelector('.wrap').insertAdjacentHTML('afterbegin',
+      '<p style="color:var(--red); font-family:var(--font-mono); padding:20px 0;">No se pudieron cargar los datos (revisa que /data/*.json exista en este repo).</p>');
+  }
+  document.getElementById("lastUpdate").textContent = new Date().toLocaleDateString('es-ES', {year:'numeric', month:'long', day:'numeric'});
+}
+
+function escapeHtml(str){
+  if(str === undefined || str === null) return '';
+  return String(str).replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+}
+function escapeAttr(str){
+  if(str === undefined || str === null) return '';
+  return String(str).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function renderTicker(){
+  const items = TORNEOS.map(t =>
+    `<span><span class="pulse" style="${t.status==='live' ? '' : 'background:var(--cyan)'}"></span>
+      <b>${t.status==='live' ? 'EN CURSO' : 'PRÓXIMO'}</b> — ${escapeHtml(t.nombre)} · ${escapeHtml(t.fechas)}
+    </span>`
+  ).join("");
+  document.getElementById("tickerTrack").innerHTML = items + items;
+}
+
+function renderTorneos(){
+  const grid = document.getElementById("tourneyGrid");
+  grid.innerHTML = TORNEOS.map(t => `
+    <div class="hud-box tourney-card">
+      <div class="tourney-top">
+        <h3>${escapeHtml(t.nombre)}</h3>
+        <span class="tag ${t.status==='live' ? 'tag--live' : ''}">${t.status==='live' ? '● En curso' : 'Próximo'}</span>
+      </div>
+      <div class="tourney-date">${escapeHtml(t.fechas)}</div>
+      <p class="tourney-desc">${escapeHtml(t.descripcion)}</p>
+      <div class="tourney-tags">
+        ${t.formato==='singles' || t.formato==='ambos' ? '<span class="tag tag--singles">Singles</span>' : ''}
+        ${t.formato==='doubles' || t.formato==='ambos' ? '<span class="tag tag--doubles">Doubles</span>' : ''}
+      </div>
+      <a class="tourney-link" href="${escapeAttr(t.link || '#')}">Más información →</a>
+    </div>
+  `).join("");
+  renderTicker();
+}
+
+function renderTierList(formato){
+  currentTierFmt = formato;
+  const data = TIERS[formato] || {};
+  const container = document.getElementById("tierListContainer");
+  const orden = ["S","A","B","C","D"];
+  container.innerHTML = orden
+    .filter(t => data[t] && data[t].length)
+    .map(tier => `
+      <div class="tier-row" data-tier="${tier}">
+        <div class="tier-label">${tier}</div>
+        <div class="tier-mons">
+          ${data[tier].map(m => `
+            <div class="mon-chip">
+              <img src="${sprite(m.dex)}" alt="${escapeAttr(m.nombre)}" loading="lazy">
+              <div class="mon-info">
+                <div class="mon-name">${escapeHtml(m.nombre)}</div>
+                <div class="mon-note">${escapeHtml(m.nota)}</div>
+              </div>
+            </div>
+          `).join("")}
+        </div>
+      </div>
+    `).join("") || `<p style="color:var(--text-muted); font-family:var(--font-mono); font-size:13px;">Todavía no hay Pokémon en esta tier list.</p>`;
+}
+
+function renderEquipos(formato){
+  currentTeamFmt = formato;
+  const grid = document.getElementById("teamGrid");
+  grid.innerHTML = (EQUIPOS[formato] || []).map(team => `
+    <div class="hud-box team-card">
+      <div class="team-head">
+        <h3>${escapeHtml(team.nombre)}</h3>
+        <span class="tag ${formato==='singles' ? 'tag--singles' : 'tag--doubles'}">${formato==='singles' ? 'Singles 3v3' : 'Doubles 4v4'}</span>
+      </div>
+      <div class="team-archetype">${escapeHtml(team.arquetipo)}</div>
+      <p class="team-strategy">${escapeHtml(team.estrategia)}</p>
+      <div class="team-slots">
+        ${team.mons.map(m => `
+          <div class="slot">
+            <img src="${sprite(m.dex)}" alt="${escapeAttr(m.nombre)}" loading="lazy">
+            <div class="slot-name">${escapeHtml(m.nombre)}</div>
+            <div class="slot-item">${escapeHtml(m.item)}</div>
+            <div class="slot-note">${escapeHtml(m.nota)}</div>
+          </div>
+        `).join("")}
+      </div>
+    </div>
+  `).join("");
+}
+
+function renderPokedex(filter){
+  filter = (filter || '').trim().toLowerCase();
+  const grid = document.getElementById('pokedexGrid');
+  const empty = document.getElementById('pokedexEmpty');
+  const list = POKEDEX_SPECIES.filter(([dex, nombre]) => nombre.toLowerCase().includes(filter));
+
+  document.getElementById('pokedexStats').innerHTML =
+    `<b>${Object.keys(POKEDEX_BUILDS).length}</b> / ${POKEDEX_SPECIES.length} con build actualizada`;
+
+  if(list.length === 0){
+    grid.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+
+  grid.innerHTML = list.map(([dex, nombre]) => {
+    const hasBuild = !!POKEDEX_BUILDS[dex];
+    return `
+      <div class="poke-card ${hasBuild ? 'has-build' : ''}" onclick="openPokeModal(${dex})">
+        <span class="poke-status" title="${hasBuild ? 'Build actualizada' : 'Sin build todavía'}"></span>
+        <img src="${sprite(dex)}" alt="${escapeAttr(nombre)}" loading="lazy">
+        <div class="poke-dex">#${String(dex).padStart(4,'0')}</div>
+        <div class="poke-name">${escapeHtml(nombre)}</div>
+      </div>
+    `;
+  }).join('');
+}
+
+function openPokeModal(dex){
+  const entry = POKEDEX_SPECIES.find(([d]) => d === dex);
+  if(!entry) return;
+  const nombre = entry[1];
+  const build = POKEDEX_BUILDS[dex];
+
+  openModal(`
+    <div class="modal-poke-head">
+      <img src="${sprite(dex)}" alt="${escapeAttr(nombre)}">
+      <div>
+        <h3 style="margin-bottom:2px;">${escapeHtml(nombre)}</h3>
+        <span class="tag">#${String(dex).padStart(4,'0')}</span>
+      </div>
+    </div>
+    ${build ? `
+      <div class="build-view">
+        <dl>
+          <dt>Objeto</dt><dd>${escapeHtml(build.item) || '—'}</dd>
+          <dt>Habilidad</dt><dd>${escapeHtml(build.habilidad) || '—'}</dd>
+          <dt>Naturaleza</dt><dd>${escapeHtml(build.naturaleza) || '—'}</dd>
+          <dt>EVs</dt><dd>${escapeHtml(build.evs) || '—'}</dd>
+          <dt>Movimientos</dt><dd>${[build.mov1,build.mov2,build.mov3,build.mov4].filter(Boolean).map(escapeHtml).join(' · ') || '—'}</dd>
+          <dt>Nota</dt><dd>${escapeHtml(build.nota) || '—'}</dd>
+        </dl>
+      </div>
+    ` : `<div class="build-empty">Todavía no se actualizó la mejor forma de equipar a ${escapeHtml(nombre)}.</div>`}
+    <div class="modal-actions">
+      <button class="btn btn--ghost btn--sm" onclick="closeModal()">Cerrar</button>
+    </div>
+  `);
+}
+
+function openModal(html){
+  document.getElementById('modalContent').innerHTML = html;
+  document.getElementById('modalOverlay').classList.add('open');
+}
+function closeModal(){
+  document.getElementById('modalOverlay').classList.remove('open');
+  document.getElementById('modalContent').innerHTML = '';
+}
+
+document.getElementById('pokedexSearch').addEventListener('input', e => renderPokedex(e.target.value));
+
+document.querySelectorAll('.switch').forEach(sw => {
+  sw.addEventListener('click', e => {
+    const btn = e.target.closest('button');
+    if(!btn) return;
+    sw.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const fmt = btn.dataset.fmt;
+    if(sw.dataset.group === 'tier') renderTierList(fmt);
+    if(sw.dataset.group === 'teams') renderEquipos(fmt);
+  });
+});
+
+(async function init(){
+  await loadAllData();
+  renderTorneos();
+  renderTierList('singles');
+  renderEquipos('singles');
+  renderPokedex('');
+})();
+</script>
+
+</body>
+</html>

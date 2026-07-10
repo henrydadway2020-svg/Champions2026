@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Champions Hub · Panel de administración</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="admin-banner">🔒 PANEL PRIVADO — esta página no está enlazada desde el sitio público. Sin tu token de GitHub, nadie puede guardar cambios aquí.</div>
+
+<header class="nav">
+  <div class="nav-inner">
+    <div class="brand"><span class="dot"></span> Champions Hub · Admin</div>
+    <nav class="links">
+      <a href="#config">Conexión</a>
+      <a href="#torneos">Torneos</a>
+      <a href="#tierlist">Tier List</a>
+      <a href="#equipos">Equipos</a>
+      <a href="#pokedex">Pokédex</a>
+      <a href="#especies">Roster</a>
+      <a href="index.html" class="admin-link">Ver sitio público →</a>
+    </nav>
+  </div>
+</header>
+
+<div class="wrap" style="padding-top:32px;">
+
+  <section id="config" style="padding:0 0 32px;">
+    <div class="hud-box config-box">
+      <h3>Conexión con GitHub</h3>
+      <p class="hint">Tu token se guarda solo en este navegador (localStorage), nunca se sube al repositorio. Necesita permiso de escritura de "Contents" sobre el repo.</p>
+      <div class="field-row">
+        <div class="field"><label>Usuario u organización</label><input id="cfgOwner" placeholder="Ej. tu-usuario"></div>
+        <div class="field"><label>Repositorio</label><input id="cfgRepo" placeholder="Ej. champions-hub"></div>
+      </div>
+      <div class="field-row">
+        <div class="field"><label>Rama</label><input id="cfgBranch" placeholder="main" value="main"></div>
+        <div class="field"><label>Token de GitHub (fine-grained, Contents: Read/Write)</label><input id="cfgToken" type="password" placeholder="github_pat_..."></div>
+      </div>
+      <div class="modal-actions" style="justify-content:flex-start;">
+        <button class="btn btn--primary btn--sm" onclick="connectAndLoad()">Conectar y cargar datos</button>
+        <button class="btn btn--ghost btn--sm" onclick="forgetConfig()">Olvidar credenciales</button>
+      </div>
+      <div id="statusLine" class="status-line" style="display:none;"></div>
+    </div>
+  </section>
+
+  <div id="adminContent" style="display:none;">
+
+    <section id="torneos">
+      <div class="section-head">
+        <div><span class="eyebrow">Comunidad</span><h2>Torneos vigentes</h2></div>
+        <div class="section-actions"><button class="btn btn--primary btn--sm" onclick="openTorneoForm()">+ Nuevo torneo</button></div>
+      </div>
+      <div class="tourney-grid" id="tourneyGrid"></div>
+    </section>
+
+    <section id="tierlist">
+      <div class="section-head">
+        <div><span class="eyebrow">Meta actual</span><h2>Tier list</h2></div>
+        <div class="section-actions">
+          <button class="btn btn--primary btn--sm" onclick="openTierForm()">+ Agregar Pokémon</button>
+          <div class="switch" data-group="tier">
+            <button data-fmt="singles" class="active">Singles</button>
+            <button data-fmt="doubles">Doubles</button>
+          </div>
+        </div>
+      </div>
+      <div id="tierListContainer"></div>
+    </section>
+
+    <section id="equipos">
+      <div class="section-head">
+        <div><span class="eyebrow">Team building</span><h2>Equipos armados</h2></div>
+        <div class="section-actions">
+          <button class="btn btn--primary btn--sm" onclick="openTeamForm(currentTeamFmt)">+ Nuevo equipo</button>
+          <div class="switch" data-group="teams">
+            <button data-fmt="singles" class="active">Singles</button>
+            <button data-fmt="doubles">Doubles</button>
+          </div>
+        </div>
+      </div>
+      <div class="team-grid" id="teamGrid"></div>
+    </section>
+
+    <section id="pokedex">
+      <div class="section-head">
+        <div><span class="eyebrow">Base de datos</span><h2>Pokédex Champions</h2></div>
+        <div class="pokedex-stats" id="pokedexStats"></div>
+      </div>
+      <div class="pokedex-toolbar"><input type="text" class="pokedex-search" id="pokedexSearch" placeholder="Buscar Pokémon por nombre..."></div>
+      <div class="pokedex-grid" id="pokedexGrid"></div>
+      <div class="pokedex-empty" id="pokedexEmpty" style="display:none;">No se encontró ningún Pokémon con ese nombre.</div>
+    </section>
+
+    <section id="especies">
+      <div class="section-head">
+        <div><span class="eyebrow">Roster base</span><h2>Especies disponibles</h2></div>
+      </div>
+      <p class="hint" style="color:var(--text-muted); font-size:13px; margin-bottom:14px;">Esta es la lista de Pokémon que aparece en los selectores de Tier List y Pokédex. Agrega aquí cuando salga una nueva regulación.</p>
+      <div class="field-row">
+        <div class="field"><label>Número de Pokédex</label><input id="spDex" type="number" placeholder="Ej. 6"></div>
+        <div class="field"><label>Nombre</label><input id="spNombre" placeholder="Ej. Charizard"></div>
+      </div>
+      <button class="btn btn--primary btn--sm" onclick="addSpecies()">+ Agregar especie</button>
+      <div class="species-list" id="speciesList"></div>
+    </section>
+
+  </div>
+</div>
+
+<div class="modal-overlay" id="modalOverlay" onclick="if(event.target===this) closeModal()">
+  <div class="modal-box" id="modalBox">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div id="modalContent"></div>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   CONFIG / localStorage
+   ============================================================ */
+const CONFIG_KEY = 'champions_admin_config';
+let CONFIG = JSON.parse(localStorage.getItem(CONFIG_KEY) || 'null') || { owner:'', repo:'', branch:'main', token:'' };
+
+const FILES = {
+  torneos: 'data/torneos.json',
+  tiers: 'data/tiers.json',
+  equipos: 'data/equipos.json',
+  pokedex_builds: 'data/pokedex_builds.json',
+  pokedex_species: 'data/pokedex_species.json'
+};
+const DEFAULTS = {
+  torneos: [],
+  tiers: { singles:{}, doubles:{} },
+  equipos: { singles:[], doubles:[] },
+  pokedex_builds: {},
+  pokedex_species: []
+};
+let SHAS = {};
+
+let TORNEOS = [], TIERS = {}, EQUIPOS = {}, POKEDEX_SPECIES = [], POKEDEX_BUILDS = {};
+let currentTierFmt = 'singles';
+let currentTeamFmt = 'singles';
+let editingTorneoIndex = null;
+let editingTeamIndex = null;
+let editingTeamFormato = 'singles';
+let formMons = [];
+
+const SPRITE_BASE = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/";
+const sprite = dex => `${SPRITE_BASE}${dex}.png`;
+
+function fillConfigForm(){
+  document.getElementById('cfgOwner').value = CONFIG.owner || '';
+  document.getElementById('cfgRepo').value = CONFIG.repo || '';
+  document.getElementById('cfgBranch').value = CONFIG.branch || 'main';
+  document.getElementById('cfgToken').value = CONFIG.token || '';
+}
+function forgetConfig(){
+  localStorage.removeItem(CONFIG_KEY);
+  CONFIG = { owner:'', repo:'', branch:'main', token:'' };
+  fillConfigForm();
+  document.getElementById('adminContent').style.display = 'none';
+  setStatus('Credenciales olvidadas.', null);
+}
+function setStatus(msg, ok){
+  const el = document.getElementById('statusLine');
+  el.style.display = 'flex';
+  el.className = 'status-line' + (ok===true ? ' ok' : ok===false ? ' err' : '');
+  el.textContent = msg;
+}
+
+/* ============================================================
+   GitHub API (Contents API)
+   ============================================================ */
+function b64EncodeUnicode(str){
+  return btoa(encodeURIComponent(str).replace(/%([0-9A-F]{2})/g, (m,p1) => String.fromCharCode('0x'+p1)));
+}
+function b64DecodeUnicode(str){
+  return decodeURIComponent(atob(str).split('').map(c => '%'+('00'+c.charCodeAt(0).toString(16)).slice(-2)).join(''));
+}
+
+async function ghRequest(method, path, body){
+  const url = `https://api.github.com/repos/${CONFIG.owner}/${CONFIG.repo}/contents/${path}${method==='GET' ? '?ref='+encodeURIComponent(CONFIG.branch) : ''}`;
+  const opts = { method, headers:{ 'Authorization':`Bearer ${CONFIG.token}`, 'Accept':'application/vnd.github+json' } };
+  if(body){ opts.headers['Content-Type']='application/json'; opts.body=JSON.stringify(body); }
+  const res = await fetch(url, opts);
+  if(res.status === 404) return null;
+  if(!res.ok){
+    let msg = res.statusText;
+    try{ const err = await res.json(); if(err.message) msg = err.message; }catch(e){}
+    throw new Error(`${res.status} ${msg}`);
+  }
+  return res.json();
+}
+
+async function loadFile(key){
+  const data = await ghRequest('GET', FILES[key]);
+  if(!data){ SHAS[key] = null; return JSON.parse(JSON.stringify(DEFAULTS[key])); }
+  SHAS[key] = data.sha;
+  return JSON.parse(b64DecodeUnicode(data.content.replace(/\n/g,'')));
+}
+
+async function saveFile(key, obj, message){
+  const body = { message, content: b64EncodeUnicode(JSON.stringify(obj, null, 2)), branch: CONFIG.branch };
+  if(SHAS[key]) body.sha = SHAS[key];
+  const res = await ghRequest('PUT', FILES[key], body);
+  SHAS[key] = res.content.sha;
+}
+
+async function persist(key, obj, message){
+  try{
+    await saveFile(key, obj, message);
+    setStatus('✓ Guardado en GitHub — ' + message, true);
+  }catch(e){
+    alert('No se pudo guardar en GitHub: ' + e.message);
+    setStatus('✕ Error al guardar: ' + e.message, false);
+    throw e;
+  }
+}
+
+async function connectAndLoad(){
+  CONFIG = {
+    owner: document.getElementById('cfgOwner').value.trim(),
+    repo: document.getElementById('cfgRepo').value.trim(),
+    branch: document.getElementById('cfgBranch').value.trim() || 'main',
+    token: document.getElementById('cfgToken').value.trim()
+  };
+  if(!CONFIG.owner || !CONFIG.repo || !CONFIG.token){
+    alert('Completa usuario, repositorio y token.');
+    return;
+  }
+  localStorage.setItem(CONFIG_KEY, JSON.stringify(CONFIG));
+  setStatus('Conectando...', null);
+  try{
+    [TORNEOS, TIERS, EQUIPOS, POKEDEX_SPECIES, POKEDEX_BUILDS] = await Promise.all([
+      loadFile('torneos'), loadFile('tiers'), loadFile('equipos'), loadFile('pokedex_species'), loadFile('pokedex_builds')
+    ]);
+    document.getElementById('adminContent').style.display = 'block';
+    setStatus(`✓ Conectado a ${CONFIG.owner}/${CONFIG.repo} (${CONFIG.branch})`, true);
+    renderTorneos();
+    renderTierList('singles');
+    renderEquipos('singles');
+    renderPokedex('');
+    renderSpeciesAdmin();
+  }catch(e){
+    setStatus('✕ No se pudo conectar: ' + e.message, false);
+  }
+}
+
+/* ============================================================
+   Utilidades
+   ============================================================ */
+function escapeHtml(str){ if(str===undefined||str===null) return ''; return String(str).replace(/[&<>]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])); }
+function escapeAttr(str){ if(str===undefined||str===null) return ''; return String(str).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function openModal(html){ document.getElementById('modalContent').innerHTML = html; document.getElementById('modalOverlay').classList.add('open'); }
+function closeModal(){ document.getElementById('modalOverlay').classList.remove('open'); document.getElementById('modalContent').innerHTML = ''; }
+
+/* ============================================================
+   TORNEOS
+   ============================================================ */
+function renderTorneos(){
+  const grid = document.getElementById("tourneyGrid");
+  grid.innerHTML = TORNEOS.map((t, i) => `
+    <div class="hud-box tourney-card">
+      <div class="tourney-top">
+        <h3>${escapeHtml(t.nombre)}</h3>
+        <span class="tag ${t.status==='live' ? 'tag--live' : ''}">${t.status==='live' ? '● En curso' : 'Próximo'}</span>
+      </div>
+      <div class="tourney-date">${escapeHtml(t.fechas)}</div>
+      <p class="tourney-desc">${escapeHtml(t.descripcion)}</p>
+      <div class="tourney-tags">
+        ${t.formato==='singles' || t.formato==='ambos' ? '<span class="tag tag--singles">Singles</span>' : ''}
+        ${t.formato==='doubles' || t.formato==='ambos' ? '<span class="tag tag--doubles">Doubles</span>' : ''}
+        <div class="tourney-editbar">
+          <button class="icon-btn" title="Editar" onclick="openTorneoForm(${i})">✎</button>
+          <button class="icon-btn danger" title="Eliminar" onclick="deleteTorneo(${i})">✕</button>
+        </div>
+      </div>
+      <a class="tourney-link" href="${escapeAttr(t.link || '#')}">Más información →</a>
+    </div>
+  `).join("");
+}
+
+function openTorneoForm(index){
+  editingTorneoIndex = (typeof index === 'number') ? index : null;
+  const t = editingTorneoIndex !== null ? TORNEOS[editingTorneoIndex] : { nombre:'', status:'proximo', formato:'ambos', fechas:'', descripcion:'', link:'' };
+  openModal(`
+    <h3>${editingTorneoIndex !== null ? 'Editar torneo' : 'Nuevo torneo'}</h3>
+    <div class="field"><label>Nombre</label><input id="fNombre" value="${escapeAttr(t.nombre)}" placeholder="Ej. Copa Champions M-5"></div>
+    <div class="field-row">
+      <div class="field"><label>Estado</label>
+        <select id="fStatus">
+          <option value="proximo" ${t.status==='proximo'?'selected':''}>Próximo</option>
+          <option value="live" ${t.status==='live'?'selected':''}>En curso</option>
+        </select>
+      </div>
+      <div class="field"><label>Formato</label>
+        <select id="fFormato">
+          <option value="ambos" ${t.formato==='ambos'?'selected':''}>Singles y Doubles</option>
+          <option value="singles" ${t.formato==='singles'?'selected':''}>Solo Singles</option>
+          <option value="doubles" ${t.formato==='doubles'?'selected':''}>Solo Doubles</option>
+        </select>
+      </div>
+    </div>
+    <div class="field"><label>Fechas</label><input id="fFechas" value="${escapeAttr(t.fechas)}" placeholder="Ej. 12 ago 2026"></div>
+    <div class="field"><label>Descripción</label><textarea id="fDesc">${escapeHtml(t.descripcion)}</textarea></div>
+    <div class="field"><label>Link (opcional)</label><input id="fLink" value="${escapeAttr(t.link)}" placeholder="https://..."></div>
+    <div class="modal-actions">
+      <button class="btn btn--ghost btn--sm" onclick="closeModal()">Cancelar</button>
+      <button class="btn btn--primary btn--sm" onclick="saveTorneoForm()">Guardar</button>
+    </div>
+  `);
+}
+
+async function saveTorneoForm(){
+  const nombre = document.getElementById('fNombre').value.trim();
+  if(!nombre){ alert('Ponle un nombre al torneo.'); return; }
+  const data = {
+    nombre,
+    status: document.getElementById('fStatus').value,
+    formato: document.getElementById('fFormato').value,
+    fechas: document.getElementById('fFechas').value.trim(),
+    descripcion: document.getElementById('fDesc').value.trim(),
+    link: document.getElementById('fLink').value.trim() || '#'
+  };
+  if(editingTorneoIndex !== null) TORNEOS[editingTorneoIndex] = data;
+  else TORNEOS.unshift(data);
+  await persist('torneos', TORNEOS, `Actualiza torneo: ${nombre}`);
+  renderTorneos();
+  closeModal();
+}
+
+async function deleteTorneo(index){
+  if(!confirm('¿Eliminar este torneo?')) return;
+  const nombre = TORNEOS[index].nombre;
+  TORNEOS.splice(index, 1);
+  await persist('torneos', TORNEOS, `Elimina torneo: ${nombre}`);
+  renderTorneos();
+}
+
+/* ============================================================
+   TIER LIST
+   ============================================================ */
+function renderTierList(formato){
+  currentTierFmt = formato;
+  const data = TIERS[formato] || {};
+  const container = document.getElementById("tierListContainer");
+  const orden = ["S","A","B","C","D"];
+  container.innerHTML = orden
+    .filter(t => data[t] && data[t].length)
+    .map(tier => `
+      <div class="tier-row" data-tier="${tier}">
+        <div class="tier-label">${tier}</div>
+        <div class="tier-mons">
+          ${data[tier].map((m, i) => `
+            <div class="mon-chip">
+              <img src="${sprite(m.dex)}" alt="${escapeAttr(m.nombre)}" loading="lazy">
+              <div class="mon-info">
+                <div class="mon-name">${escapeHtml(m.nombre)}</div>
+                <div class="mon-note">${escapeHtml(m.nota)}</div>
+              </div>
+              <button class="icon-btn danger" title="Quitar" onclick="deleteTierMon('${tier}', ${i})">✕</button>
+            </div>
+          `).join("")}
+        </div>
+      </div>
+    `).join("") || `<p style="color:var(--text-muted); font-family:var(--font-mono); font-size:13px;">Todavía no hay Pokémon en esta tier list. Usa "+ Agregar Pokémon" para empezar.</p>`;
+}
+
+function openTierForm(){
+  openModal(`
+    <h3>Agregar Pokémon a la tier list</h3>
+    <div class="field-row">
+      <div class="field"><label>Formato</label>
+        <select id="tFormato">
+          <option value="singles" ${currentTierFmt==='singles'?'selected':''}>Singles</option>
+          <option value="doubles" ${currentTierFmt==='doubles'?'selected':''}>Doubles</option>
+        </select>
+      </div>
+      <div class="field"><label>Tier</label>
+        <select id="tTier">
+          <option value="S">S</option><option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option>
+        </select>
+      </div>
+    </div>
+    <div class="field"><label>Pokémon</label>
+      <select id="tMon">
+        ${POKEDEX_SPECIES.map(([dex,nombre]) => `<option value="${dex}|${escapeAttr(nombre)}">${nombre} (#${String(dex).padStart(3,'0')})</option>`).join('')}
+      </select>
+    </div>
+    <div class="field"><label>Nota (por qué destaca)</label><input id="tNota" placeholder="Ej. Sweeper rápido, gran coverage"></div>
+    <div class="modal-actions">
+      <button class="btn btn--ghost btn--sm" onclick="closeModal()">Cancelar</button>
+      <button class="btn btn--primary btn--sm" onclick="saveTierForm()">Agregar</button>
+    </div>
+  `);
+}
+
+async function saveTierForm(){
+  const formato = document.getElementById('tFormato').value;
+  const tier = document.getElementById('tTier').value;
+  const [dex, nombre] = document.getElementById('tMon').value.split('|');
+  const nota = document.getElementById('tNota').value.trim() || 'Sin nota todavía';
+  if(!TIERS[formato]) TIERS[formato] = {};
+  if(!TIERS[formato][tier]) TIERS[formato][tier] = [];
+  TIERS[formato][tier].push({ nombre, dex:Number(dex), nota });
+  await persist('tiers', TIERS, `Agrega ${nombre} a tier ${tier} (${formato})`);
+  renderTierList(formato);
+  document.querySelectorAll('.switch[data-group="tier"] button').forEach(b=>{
+    b.classList.toggle('active', b.dataset.fmt === formato);
+  });
+  closeModal();
+}
+
+async function deleteTierMon(tier, index){
+  if(!confirm('¿Quitar este Pokémon de la tier list?')) return;
+  const nombre = TIERS[currentTierFmt][tier][index].nombre;
+  TIERS[currentTierFmt][tier].splice(index, 1);
+  await persist('tiers', TIERS, `Quita ${nombre} de tier ${tier} (${currentTierFmt})`);
+  renderTierList(currentTierFmt);
+}
+
+/* ============================================================
+   EQUIPOS
+   ============================================================ */
+function renderEquipos(formato){
+  currentTeamFmt = formato;
+  const grid = document.getElementById("teamGrid");
+  grid.innerHTML = (EQUIPOS[formato] || []).map((team, i) => `
+    <div class="hud-box team-card">
+      <div class="team-head">
+        <h3>${escapeHtml(team.nombre)}</h3>
+        <div class="team-editbar">
+          <span class="tag ${formato==='singles' ? 'tag--singles' : 'tag--doubles'}">${formato==='singles' ? 'Singles 3v3' : 'Doubles 4v4'}</span>
+          <button class="icon-btn" title="Editar" onclick="openTeamForm('${formato}', ${i})">✎</button>
+          <button class="icon-btn danger" title="Eliminar" onclick="deleteTeam('${formato}', ${i})">✕</button>
+        </div>
+      </div>
+      <div class="team-archetype">${escapeHtml(team.arquetipo)}</div>
+      <p class="team-strategy">${escapeHtml(team.estrategia)}</p>
+      <div class="team-slots">
+        ${team.mons.map(m => `
+          <div class="slot">
+            <img src="${sprite(m.dex)}" alt="${escapeAttr(m.nombre)}" loading="lazy">
+            <div class="slot-name">${escapeHtml(m.nombre)}</div>
+            <div class="slot-item">${escapeHtml(m.item)}</div>
+            <div class="slot-note">${escapeHtml(m.nota)}</div>
+          </div>
+        `).join("")}
+      </div>
+    </div>
+  `).join("") || `<p style="color:var(--text-muted); font-family:var(--font-mono); font-size:13px;">Todavía no hay equipos en este formato.</p>`;
+}
+
+function renderMonsEditor(){
+  const el = document.getElementById('teamMonsEditor');
+  if(!el) return;
+  el.innerHTML = formMons.map((m,i) => `
+    <div class="mons-editor-row">
+      <select onchange="updateMon(${i},'species',this.value)">
+        ${POKEDEX_SPECIES.map(([dex,nombre]) => `<option value="${dex}|${escapeAttr(nombre)}" ${m.dex==dex?'selected':''}>${nombre}</option>`).join('')}
+      </select>
+      <input placeholder="Objeto" value="${escapeAttr(m.item)}" oninput="updateMon(${i},'item',this.value)">
+      <input placeholder="Nota" value="${escapeAttr(m.nota)}" oninput="updateMon(${i},'nota',this.value)">
+      <button type="button" class="icon-btn danger" onclick="removeMonRow(${i})">✕</button>
+    </div>
+  `).join('') || '<p style="color:var(--text-muted); font-size:12px;">Sin Pokémon todavía — agrega al menos uno.</p>';
+}
+function addMonRow(){
+  const [dex,nombre] = POKEDEX_SPECIES[0] || [1,'Bulbasaur'];
+  formMons.push({ dex, nombre, item:'', nota:'' });
+  renderMonsEditor();
+}
+function updateMon(i, field, val){
+  if(field==='species'){ const [dex,nombre] = val.split('|'); formMons[i].dex = Number(dex); formMons[i].nombre = nombre; }
+  else formMons[i][field] = val;
+}
+function removeMonRow(i){ formMons.splice(i,1); renderMonsEditor(); }
+
+function openTeamForm(formato, index){
+  editingTeamFormato = formato;
+  editingTeamIndex = (typeof index === 'number') ? index : null;
+  const t = editingTeamIndex !== null ? EQUIPOS[formato][editingTeamIndex] : { nombre:'', arquetipo:'', estrategia:'', mons:[] };
+  formMons = JSON.parse(JSON.stringify(t.mons || []));
+  openModal(`
+    <h3>${editingTeamIndex!==null?'Editar equipo':'Nuevo equipo'} (${formato==='singles'?'Singles 3v3':'Doubles 4v4'})</h3>
+    <div class="field"><label>Nombre</label><input id="teNombre" value="${escapeAttr(t.nombre)}" placeholder="Ej. Hazard Stack"></div>
+    <div class="field"><label>Arquetipo</label><input id="teArquetipo" value="${escapeAttr(t.arquetipo)}" placeholder="Ej. Stall / hazards"></div>
+    <div class="field"><label>Estrategia</label><textarea id="teEstrategia">${escapeHtml(t.estrategia)}</textarea></div>
+    <div class="field"><label>Pokémon del equipo</label>
+      <div class="mons-editor" id="teamMonsEditor"></div>
+      <button type="button" class="btn btn--ghost btn--sm" onclick="addMonRow()">+ Agregar Pokémon</button>
+    </div>
+    <div class="modal-actions">
+      ${editingTeamIndex!==null ? `<button class="btn btn--ghost btn--sm" style="color:var(--red);border-color:var(--red);" onclick="deleteTeam('${formato}', ${editingTeamIndex})">Eliminar equipo</button>` : ''}
+      <button class="btn btn--ghost btn--sm" onclick="closeModal()">Cancelar</button>
+      <button class="btn btn--primary btn--sm" onclick="saveTeamForm()">Guardar</button>
+    </div>
+  `);
+  renderMonsEditor();
+}
+
+async function saveTeamForm(){
+  const nombre = document.getElementById('teNombre').value.trim();
+  if(!nombre){ alert('Ponle un nombre al equipo.'); return; }
+  if(formMons.length === 0){ alert('Agrega al menos un Pokémon al equipo.'); return; }
+  const data = {
+    nombre,
+    arquetipo: document.getElementById('teArquetipo').value.trim(),
+    estrategia: document.getElementById('teEstrategia').value.trim(),
+    mons: formMons
+  };
+  if(!EQUIPOS[editingTeamFormato]) EQUIPOS[editingTeamFormato] = [];
+  if(editingTeamIndex !== null) EQUIPOS[editingTeamFormato][editingTeamIndex] = data;
+  else EQUIPOS[editingTeamFormato].push(data);
+  await persist('equipos', EQUIPOS, `Actualiza equipo: ${nombre}`);
+  renderEquipos(currentTeamFmt);
+  closeModal();
+}
+
+async function deleteTeam(formato, index){
+  if(!confirm('¿Eliminar este equipo?')) return;
+  const nombre = EQUIPOS[formato][index].nombre;
+  EQUIPOS[formato].splice(index, 1);
+  await persist('equipos', EQUIPOS, `Elimina equipo: ${nombre}`);
+  renderEquipos(currentTeamFmt);
+  closeModal();
+}
+
+/* ============================================================
+   POKÉDEX BUILDS
+   ============================================================ */
+function renderPokedex(filter){
+  filter = (filter || '').trim().toLowerCase();
+  const grid = document.getElementById('pokedexGrid');
+  const empty = document.getElementById('pokedexEmpty');
+  const list = POKEDEX_SPECIES.filter(([dex, nombre]) => nombre.toLowerCase().includes(filter));
+
+  document.getElementById('pokedexStats').innerHTML =
+    `<b>${Object.keys(POKEDEX_BUILDS).length}</b> / ${POKEDEX_SPECIES.length} con build actualizada`;
+
+  if(list.length === 0){ grid.innerHTML = ''; empty.style.display = 'block'; return; }
+  empty.style.display = 'none';
+
+  grid.innerHTML = list.map(([dex, nombre]) => {
+    const hasBuild = !!POKEDEX_BUILDS[dex];
+    return `
+      <div class="poke-card ${hasBuild ? 'has-build' : ''}" onclick="openPokeModal(${dex})">
+        <span class="poke-status" title="${hasBuild ? 'Build actualizada' : 'Sin build todavía'}"></span>
+        <img src="${sprite(dex)}" alt="${escapeAttr(nombre)}" loading="lazy">
+        <div class="poke-dex">#${String(dex).padStart(4,'0')}</div>
+        <div class="poke-name">${escapeHtml(nombre)}</div>
+      </div>
+    `;
+  }).join('');
+}
+document.getElementById('pokedexSearch').addEventListener('input', e => renderPokedex(e.target.value));
+
+function openPokeModal(dex){
+  const entry = POKEDEX_SPECIES.find(([d]) => d === dex);
+  if(!entry) return;
+  const nombre = entry[1];
+  const build = POKEDEX_BUILDS[dex] || { item:'', habilidad:'', naturaleza:'', evs:'', mov1:'', mov2:'', mov3:'', mov4:'', nota:'' };
+  const exists = !!POKEDEX_BUILDS[dex];
+  openModal(`
+    <div class="modal-poke-head">
+      <img src="${sprite(dex)}" alt="${escapeAttr(nombre)}">
+      <div><h3 style="margin-bottom:2px;">${escapeHtml(nombre)}</h3><span class="tag">#${String(dex).padStart(4,'0')}</span></div>
+    </div>
+    <div class="field-row">
+      <div class="field"><label>Objeto</label><input id="pItem" value="${escapeAttr(build.item)}" placeholder="Ej. Leftovers"></div>
+      <div class="field"><label>Habilidad</label><input id="pHabilidad" value="${escapeAttr(build.habilidad)}" placeholder="Ej. Sand Stream"></div>
+    </div>
+    <div class="field-row">
+      <div class="field"><label>Naturaleza</label><input id="pNaturaleza" value="${escapeAttr(build.naturaleza)}" placeholder="Ej. Adamant"></div>
+      <div class="field"><label>EVs</label><input id="pEvs" value="${escapeAttr(build.evs)}" placeholder="Ej. 252 Atk / 4 Def / 252 Spe"></div>
+    </div>
+    <div class="field-row-4">
+      <div class="field"><label>Movimiento 1</label><input id="pMov1" value="${escapeAttr(build.mov1)}"></div>
+      <div class="field"><label>Movimiento 2</label><input id="pMov2" value="${escapeAttr(build.mov2)}"></div>
+      <div class="field"><label>Movimiento 3</label><input id="pMov3" value="${escapeAttr(build.mov3)}"></div>
+      <div class="field"><label>Movimiento 4</label><input id="pMov4" value="${escapeAttr(build.mov4)}"></div>
+    </div>
+    <div class="field"><label>Nota / rol en el equipo</label><textarea id="pNota">${escapeHtml(build.nota)}</textarea></div>
+    <div class="modal-actions">
+      ${exists ? `<button class="btn btn--ghost btn--sm" style="color:var(--red); border-color:var(--red);" onclick="deletePokeBuild(${dex})">Borrar build</button>` : ''}
+      <button class="btn btn--ghost btn--sm" onclick="closeModal()">Cancelar</button>
+      <button class="btn btn--primary btn--sm" onclick="savePokeBuild(${dex})">Guardar</button>
+    </div>
+  `);
+}
+
+async function savePokeBuild(dex){
+  POKEDEX_BUILDS[dex] = {
+    item: document.getElementById('pItem').value.trim(),
+    habilidad: document.getElementById('pHabilidad').value.trim(),
+    naturaleza: document.getElementById('pNaturaleza').value.trim(),
+    evs: document.getElementById('pEvs').value.trim(),
+    mov1: document.getElementById('pMov1').value.trim(),
+    mov2: document.getElementById('pMov2').value.trim(),
+    mov3: document.getElementById('pMov3').value.trim(),
+    mov4: document.getElementById('pMov4').value.trim(),
+    nota: document.getElementById('pNota').value.trim()
+  };
+  await persist('pokedex_builds', POKEDEX_BUILDS, `Actualiza build de #${dex}`);
+  renderPokedex(document.getElementById('pokedexSearch').value);
+  closeModal();
+}
+
+async function deletePokeBuild(dex){
+  if(!confirm('¿Borrar la build de este Pokémon?')) return;
+  delete POKEDEX_BUILDS[dex];
+  await persist('pokedex_builds', POKEDEX_BUILDS, `Borra build de #${dex}`);
+  renderPokedex(document.getElementById('pokedexSearch').value);
+  closeModal();
+}
+
+/* ============================================================
+   ROSTER / ESPECIES
+   ============================================================ */
+function renderSpeciesAdmin(){
+  const el = document.getElementById('speciesList');
+  el.innerHTML = POKEDEX_SPECIES.map(([dex,nombre], i) => `
+    <div class="species-list-row">
+      <span>#${String(dex).padStart(4,'0')} — ${escapeHtml(nombre)}</span>
+      <button class="icon-btn danger" onclick="deleteSpecies(${i})">✕</button>
+    </div>
+  `).join('');
+}
+async function addSpecies(){
+  const dex = Number(document.getElementById('spDex').value);
+  const nombre = document.getElementById('spNombre').value.trim();
+  if(!dex || !nombre){ alert('Completa número de Pokédex y nombre.'); return; }
+  POKEDEX_SPECIES.push([dex, nombre]);
+  POKEDEX_SPECIES.sort((a,b) => a[0]-b[0]);
+  await persist('pokedex_species', POKEDEX_SPECIES, `Agrega especie: ${nombre}`);
+  document.getElementById('spDex').value = '';
+  document.getElementById('spNombre').value = '';
+  renderSpeciesAdmin();
+}
+async function deleteSpecies(i){
+  if(!confirm('¿Quitar este Pokémon del roster?')) return;
+  const nombre = POKEDEX_SPECIES[i][1];
+  POKEDEX_SPECIES.splice(i, 1);
+  await persist('pokedex_species', POKEDEX_SPECIES, `Quita especie del roster: ${nombre}`);
+  renderSpeciesAdmin();
+}
+
+/* ============================================================
+   Switches
+   ============================================================ */
+document.querySelectorAll('.switch').forEach(sw => {
+  sw.addEventListener('click', e => {
+    const btn = e.target.closest('button');
+    if(!btn) return;
+    sw.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const fmt = btn.dataset.fmt;
+    if(sw.dataset.group === 'tier') renderTierList(fmt);
+    if(sw.dataset.group === 'teams') renderEquipos(fmt);
+  });
+});
+
+/* ============================================================
+   INIT
+   ============================================================ */
+fillConfigForm();
+if(CONFIG.owner && CONFIG.repo && CONFIG.token) connectAndLoad();
+</script>
+
+</body>
+</html>
