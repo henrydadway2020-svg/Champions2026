@@ -1,0 +1,812 @@
+[
+  {
+    "fecha": 1,
+    "abierta": true,
+    "partidos": [
+      {
+        "id": 1,
+        "jugadorA": "Omega",
+        "jugadorB": "JOS896",
+        "resultado": null
+      },
+      {
+        "id": 2,
+        "jugadorA": "GAGC",
+        "jugadorB": "Bryvil",
+        "resultado": null
+      },
+      {
+        "id": 3,
+        "jugadorA": "Ekko",
+        "jugadorB": "Vivi1600",
+        "resultado": null
+      },
+      {
+        "id": 4,
+        "jugadorA": "Lelouch",
+        "jugadorB": "Jhpkm",
+        "resultado": null
+      },
+      {
+        "id": 5,
+        "jugadorA": "Skaires",
+        "jugadorB": "Akira",
+        "resultado": null
+      },
+      {
+        "id": 6,
+        "jugadorA": "Vik",
+        "jugadorB": "Sukuna",
+        "resultado": null
+      },
+      {
+        "id": 7,
+        "jugadorA": "Gush",
+        "jugadorB": "RoninMx",
+        "resultado": null
+      },
+      {
+        "id": 8,
+        "jugadorA": "Elbolas",
+        "jugadorB": "RedWarrior",
+        "resultado": null
+      }
+    ]
+  },
+  {
+    "fecha": 2,
+    "abierta": false,
+    "partidos": [
+      {
+        "id": 9,
+        "jugadorA": "Omega",
+        "jugadorB": "Bryvil",
+        "resultado": null
+      },
+      {
+        "id": 10,
+        "jugadorA": "JOS896",
+        "jugadorB": "Vivi1600",
+        "resultado": null
+      },
+      {
+        "id": 11,
+        "jugadorA": "GAGC",
+        "jugadorB": "Jhpkm",
+        "resultado": null
+      },
+      {
+        "id": 12,
+        "jugadorA": "Ekko",
+        "jugadorB": "Akira",
+        "resultado": null
+      },
+      {
+        "id": 13,
+        "jugadorA": "Lelouch",
+        "jugadorB": "Sukuna",
+        "resultado": null
+      },
+      {
+        "id": 14,
+        "jugadorA": "Skaires",
+        "jugadorB": "RoninMx",
+        "resultado": null
+      },
+      {
+        "id": 15,
+        "jugadorA": "Vik",
+        "jugadorB": "RedWarrior",
+        "resultado": null
+      },
+      {
+        "id": 16,
+        "jugadorA": "Gush",
+        "jugadorB": "Elbolas",
+        "resultado": null
+      }
+    ]
+  },
+  {
+    "fecha": 3,
+    "abierta": false,
+    "partidos": [
+      {
+        "id": 17,
+        "jugadorA": "Omega",
+        "jugadorB": "Vivi1600",
+        "resultado": null
+      },
+      {
+        "id": 18,
+        "jugadorA": "Bryvil",
+        "jugadorB": "Jhpkm",
+        "resultado": null
+      },
+      {
+        "id": 19,
+        "jugadorA": "JOS896",
+        "jugadorB": "Akira",
+        "resultado": null
+      },
+      {
+        "id": 20,
+        "jugadorA": "GAGC",
+        "jugadorB": "Sukuna",
+        "resultado": null
+      },
+      {
+        "id": 21,
+        "jugadorA": "Ekko",
+        "jugadorB": "RoninMx",
+        "resultado": null
+      },
+      {
+        "id": 22,
+        "jugadorA": "Lelouch",
+        "jugadorB": "RedWarrior",
+        "resultado": null
+      },
+      {
+        "id": 23,
+        "jugadorA": "Skaires",
+        "jugadorB": "Elbolas",
+        "resultado": null
+      },
+      {
+        "id": 24,
+        "jugadorA": "Vik",
+        "jugadorB": "Gush",
+        "resultado": null
+      }
+    ]
+  },
+  {
+    "fecha": 4,
+    "abierta": false,
+    "partidos": [
+      {
+        "id": 25,
+        "jugadorA": "Omega",
+        "jugadorB": "Jhpkm",
+        "resultado": null
+      },
+      {
+        "id": 26,
+        "jugadorA": "Vivi1600",
+        "jugadorB": "Akira",
+        "resultado": null
+      },
+      {
+        "id": 27,
+        "jugadorA": "Bryvil",
+        "jugadorB": "Sukuna",
+        "resultado": null
+      },
+      {
+        "id": 28,
+        "jugadorA": "JOS896",
+        "jugadorB": "RoninMx",
+        "resultado": null
+      },
+      {
+        "id": 29,
+        "jugadorA": "GAGC",
+        "jugadorB": "RedWarrior",
+        "resultado": null
+      },
+      {
+        "id": 30,
+        "jugadorA": "Ekko",
+        "jugadorB": "Elbolas",
+        "resultado": null
+      },
+      {
+        "id": 31,
+        "jugadorA": "Lelouch",
+        "jugadorB": "Gush",
+        "resultado": null
+      },
+      {
+        "id": 32,
+        "jugadorA": "Skaires",
+        "jugadorB": "Vik",
+        "resultado": null
+      }
+    ]
+  },
+  {
+    "fecha": 5,
+    "abierta": false,
+    "partidos": [
+      {
+        "id": 33,
+        "jugadorA": "Omega",
+        "jugadorB": "Akira",
+        "resultado": null
+      },
+      {
+        "id": 34,
+        "jugadorA": "Jhpkm",
+        "jugadorB": "Sukuna",
+        "resultado": null
+      },
+      {
+        "id": 35,
+        "jugadorA": "Vivi1600",
+        "jugadorB": "RoninMx",
+        "resultado": null
+      },
+      {
+        "id": 36,
+        "jugadorA": "Bryvil",
+        "jugadorB": "RedWarrior",
+        "resultado": null
+      },
+      {
+        "id": 37,
+        "jugadorA": "JOS896",
+        "jugadorB": "Elbolas",
+        "resultado": null
+      },
+      {
+        "id": 38,
+        "jugadorA": "GAGC",
+        "jugadorB": "Gush",
+        "resultado": null
+      },
+      {
+        "id": 39,
+        "jugadorA": "Ekko",
+        "jugadorB": "Vik",
+        "resultado": null
+      },
+      {
+        "id": 40,
+        "jugadorA": "Lelouch",
+        "jugadorB": "Skaires",
+        "resultado": null
+      }
+    ]
+  },
+  {
+    "fecha": 6,
+    "abierta": false,
+    "partidos": [
+      {
+        "id": 41,
+        "jugadorA": "Omega",
+        "jugadorB": "Sukuna",
+        "resultado": null
+      },
+      {
+        "id": 42,
+        "jugadorA": "Akira",
+        "jugadorB": "RoninMx",
+        "resultado": null
+      },
+      {
+        "id": 43,
+        "jugadorA": "Jhpkm",
+        "jugadorB": "RedWarrior",
+        "resultado": null
+      },
+      {
+        "id": 44,
+        "jugadorA": "Vivi1600",
+        "jugadorB": "Elbolas",
+        "resultado": null
+      },
+      {
+        "id": 45,
+        "jugadorA": "Bryvil",
+        "jugadorB": "Gush",
+        "resultado": null
+      },
+      {
+        "id": 46,
+        "jugadorA": "JOS896",
+        "jugadorB": "Vik",
+        "resultado": null
+      },
+      {
+        "id": 47,
+        "jugadorA": "GAGC",
+        "jugadorB": "Skaires",
+        "resultado": null
+      },
+      {
+        "id": 48,
+        "jugadorA": "Ekko",
+        "jugadorB": "Lelouch",
+        "resultado": null
+      }
+    ]
+  },
+  {
+    "fecha": 7,
+    "abierta": false,
+    "partidos": [
+      {
+        "id": 49,
+        "jugadorA": "Omega",
+        "jugadorB": "RoninMx",
+        "resultado": null
+      },
+      {
+        "id": 50,
+        "jugadorA": "Sukuna",
+        "jugadorB": "RedWarrior",
+        "resultado": null
+      },
+      {
+        "id": 51,
+        "jugadorA": "Akira",
+        "jugadorB": "Elbolas",
+        "resultado": null
+      },
+      {
+        "id": 52,
+        "jugadorA": "Jhpkm",
+        "jugadorB": "Gush",
+        "resultado": null
+      },
+      {
+        "id": 53,
+        "jugadorA": "Vivi1600",
+        "jugadorB": "Vik",
+        "resultado": null
+      },
+      {
+        "id": 54,
+        "jugadorA": "Bryvil",
+        "jugadorB": "Skaires",
+        "resultado": null
+      },
+      {
+        "id": 55,
+        "jugadorA": "JOS896",
+        "jugadorB": "Lelouch",
+        "resultado": null
+      },
+      {
+        "id": 56,
+        "jugadorA": "GAGC",
+        "jugadorB": "Ekko",
+        "resultado": null
+      }
+    ]
+  },
+  {
+    "fecha": 8,
+    "abierta": false,
+    "partidos": [
+      {
+        "id": 57,
+        "jugadorA": "Omega",
+        "jugadorB": "RedWarrior",
+        "resultado": null
+      },
+      {
+        "id": 58,
+        "jugadorA": "RoninMx",
+        "jugadorB": "Elbolas",
+        "resultado": null
+      },
+      {
+        "id": 59,
+        "jugadorA": "Sukuna",
+        "jugadorB": "Gush",
+        "resultado": null
+      },
+      {
+        "id": 60,
+        "jugadorA": "Akira",
+        "jugadorB": "Vik",
+        "resultado": null
+      },
+      {
+        "id": 61,
+        "jugadorA": "Jhpkm",
+        "jugadorB": "Skaires",
+        "resultado": null
+      },
+      {
+        "id": 62,
+        "jugadorA": "Vivi1600",
+        "jugadorB": "Lelouch",
+        "resultado": null
+      },
+      {
+        "id": 63,
+        "jugadorA": "Bryvil",
+        "jugadorB": "Ekko",
+        "resultado": null
+      },
+      {
+        "id": 64,
+        "jugadorA": "JOS896",
+        "jugadorB": "GAGC",
+        "resultado": null
+      }
+    ]
+  },
+  {
+    "fecha": 9,
+    "abierta": false,
+    "partidos": [
+      {
+        "id": 65,
+        "jugadorA": "Omega",
+        "jugadorB": "Elbolas",
+        "resultado": null
+      },
+      {
+        "id": 66,
+        "jugadorA": "RedWarrior",
+        "jugadorB": "Gush",
+        "resultado": null
+      },
+      {
+        "id": 67,
+        "jugadorA": "RoninMx",
+        "jugadorB": "Vik",
+        "resultado": null
+      },
+      {
+        "id": 68,
+        "jugadorA": "Sukuna",
+        "jugadorB": "Skaires",
+        "resultado": null
+      },
+      {
+        "id": 69,
+        "jugadorA": "Akira",
+        "jugadorB": "Lelouch",
+        "resultado": null
+      },
+      {
+        "id": 70,
+        "jugadorA": "Jhpkm",
+        "jugadorB": "Ekko",
+        "resultado": null
+      },
+      {
+        "id": 71,
+        "jugadorA": "Vivi1600",
+        "jugadorB": "GAGC",
+        "resultado": null
+      },
+      {
+        "id": 72,
+        "jugadorA": "Bryvil",
+        "jugadorB": "JOS896",
+        "resultado": null
+      }
+    ]
+  },
+  {
+    "fecha": 10,
+    "abierta": false,
+    "partidos": [
+      {
+        "id": 73,
+        "jugadorA": "Omega",
+        "jugadorB": "Gush",
+        "resultado": null
+      },
+      {
+        "id": 74,
+        "jugadorA": "Elbolas",
+        "jugadorB": "Vik",
+        "resultado": null
+      },
+      {
+        "id": 75,
+        "jugadorA": "RedWarrior",
+        "jugadorB": "Skaires",
+        "resultado": null
+      },
+      {
+        "id": 76,
+        "jugadorA": "RoninMx",
+        "jugadorB": "Lelouch",
+        "resultado": null
+      },
+      {
+        "id": 77,
+        "jugadorA": "Sukuna",
+        "jugadorB": "Ekko",
+        "resultado": null
+      },
+      {
+        "id": 78,
+        "jugadorA": "Akira",
+        "jugadorB": "GAGC",
+        "resultado": null
+      },
+      {
+        "id": 79,
+        "jugadorA": "Jhpkm",
+        "jugadorB": "JOS896",
+        "resultado": null
+      },
+      {
+        "id": 80,
+        "jugadorA": "Vivi1600",
+        "jugadorB": "Bryvil",
+        "resultado": null
+      }
+    ]
+  },
+  {
+    "fecha": 11,
+    "abierta": false,
+    "partidos": [
+      {
+        "id": 81,
+        "jugadorA": "Omega",
+        "jugadorB": "Vik",
+        "resultado": null
+      },
+      {
+        "id": 82,
+        "jugadorA": "Gush",
+        "jugadorB": "Skaires",
+        "resultado": null
+      },
+      {
+        "id": 83,
+        "jugadorA": "Elbolas",
+        "jugadorB": "Lelouch",
+        "resultado": null
+      },
+      {
+        "id": 84,
+        "jugadorA": "RedWarrior",
+        "jugadorB": "Ekko",
+        "resultado": null
+      },
+      {
+        "id": 85,
+        "jugadorA": "RoninMx",
+        "jugadorB": "GAGC",
+        "resultado": null
+      },
+      {
+        "id": 86,
+        "jugadorA": "Sukuna",
+        "jugadorB": "JOS896",
+        "resultado": null
+      },
+      {
+        "id": 87,
+        "jugadorA": "Akira",
+        "jugadorB": "Bryvil",
+        "resultado": null
+      },
+      {
+        "id": 88,
+        "jugadorA": "Jhpkm",
+        "jugadorB": "Vivi1600",
+        "resultado": null
+      }
+    ]
+  },
+  {
+    "fecha": 12,
+    "abierta": false,
+    "partidos": [
+      {
+        "id": 89,
+        "jugadorA": "Omega",
+        "jugadorB": "Skaires",
+        "resultado": null
+      },
+      {
+        "id": 90,
+        "jugadorA": "Vik",
+        "jugadorB": "Lelouch",
+        "resultado": null
+      },
+      {
+        "id": 91,
+        "jugadorA": "Gush",
+        "jugadorB": "Ekko",
+        "resultado": null
+      },
+      {
+        "id": 92,
+        "jugadorA": "Elbolas",
+        "jugadorB": "GAGC",
+        "resultado": null
+      },
+      {
+        "id": 93,
+        "jugadorA": "RedWarrior",
+        "jugadorB": "JOS896",
+        "resultado": null
+      },
+      {
+        "id": 94,
+        "jugadorA": "RoninMx",
+        "jugadorB": "Bryvil",
+        "resultado": null
+      },
+      {
+        "id": 95,
+        "jugadorA": "Sukuna",
+        "jugadorB": "Vivi1600",
+        "resultado": null
+      },
+      {
+        "id": 96,
+        "jugadorA": "Akira",
+        "jugadorB": "Jhpkm",
+        "resultado": null
+      }
+    ]
+  },
+  {
+    "fecha": 13,
+    "abierta": false,
+    "partidos": [
+      {
+        "id": 97,
+        "jugadorA": "Omega",
+        "jugadorB": "Lelouch",
+        "resultado": null
+      },
+      {
+        "id": 98,
+        "jugadorA": "Skaires",
+        "jugadorB": "Ekko",
+        "resultado": null
+      },
+      {
+        "id": 99,
+        "jugadorA": "Vik",
+        "jugadorB": "GAGC",
+        "resultado": null
+      },
+      {
+        "id": 100,
+        "jugadorA": "Gush",
+        "jugadorB": "JOS896",
+        "resultado": null
+      },
+      {
+        "id": 101,
+        "jugadorA": "Elbolas",
+        "jugadorB": "Bryvil",
+        "resultado": null
+      },
+      {
+        "id": 102,
+        "jugadorA": "RedWarrior",
+        "jugadorB": "Vivi1600",
+        "resultado": null
+      },
+      {
+        "id": 103,
+        "jugadorA": "RoninMx",
+        "jugadorB": "Jhpkm",
+        "resultado": null
+      },
+      {
+        "id": 104,
+        "jugadorA": "Sukuna",
+        "jugadorB": "Akira",
+        "resultado": null
+      }
+    ]
+  },
+  {
+    "fecha": 14,
+    "abierta": false,
+    "partidos": [
+      {
+        "id": 105,
+        "jugadorA": "Omega",
+        "jugadorB": "Ekko",
+        "resultado": null
+      },
+      {
+        "id": 106,
+        "jugadorA": "Lelouch",
+        "jugadorB": "GAGC",
+        "resultado": null
+      },
+      {
+        "id": 107,
+        "jugadorA": "Skaires",
+        "jugadorB": "JOS896",
+        "resultado": null
+      },
+      {
+        "id": 108,
+        "jugadorA": "Vik",
+        "jugadorB": "Bryvil",
+        "resultado": null
+      },
+      {
+        "id": 109,
+        "jugadorA": "Gush",
+        "jugadorB": "Vivi1600",
+        "resultado": null
+      },
+      {
+        "id": 110,
+        "jugadorA": "Elbolas",
+        "jugadorB": "Jhpkm",
+        "resultado": null
+      },
+      {
+        "id": 111,
+        "jugadorA": "RedWarrior",
+        "jugadorB": "Akira",
+        "resultado": null
+      },
+      {
+        "id": 112,
+        "jugadorA": "RoninMx",
+        "jugadorB": "Sukuna",
+        "resultado": null
+      }
+    ]
+  },
+  {
+    "fecha": 15,
+    "abierta": false,
+    "partidos": [
+      {
+        "id": 113,
+        "jugadorA": "Omega",
+        "jugadorB": "GAGC",
+        "resultado": null
+      },
+      {
+        "id": 114,
+        "jugadorA": "Ekko",
+        "jugadorB": "JOS896",
+        "resultado": null
+      },
+      {
+        "id": 115,
+        "jugadorA": "Lelouch",
+        "jugadorB": "Bryvil",
+        "resultado": null
+      },
+      {
+        "id": 116,
+        "jugadorA": "Skaires",
+        "jugadorB": "Vivi1600",
+        "resultado": null
+      },
+      {
+        "id": 117,
+        "jugadorA": "Vik",
+        "jugadorB": "Jhpkm",
+        "resultado": null
+      },
+      {
+        "id": 118,
+        "jugadorA": "Gush",
+        "jugadorB": "Akira",
+        "resultado": null
+      },
+      {
+        "id": 119,
+        "jugadorA": "Elbolas",
+        "jugadorB": "Sukuna",
+        "resultado": null
+      },
+      {
+        "id": 120,
+        "jugadorA": "RedWarrior",
+        "jugadorB": "RoninMx",
+        "resultado": null
+      }
+    ]
+  }
+]

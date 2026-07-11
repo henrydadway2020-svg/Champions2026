@@ -1,0 +1,36 @@
+{
+  "temporadaNumero": 1,
+  "temporadaNombre": "Liga Regular - Temporada 1",
+  "ligaNombre": "BATTLE CHAMPIONS LEAGUE",
+  "formato": "doubles",
+  "bo": "BO3",
+  "totalJugadores": 16,
+  "totalFechas": 15,
+  "estado": "en_curso",
+  "puntos": {
+    "victoria": 3,
+    "derrota": 0
+  },
+  "desempate": [
+    "Enfrentamiento directo",
+    "Diferencia de juegos (BO3)",
+    "Mayor cantidad de victorias",
+    "Sorteo"
+  ],
+  "premios": {
+    "primero": "Floette",
+    "segundo": "Archaludon Shiny"
+  },
+  "playoffsFormato": {
+    "semifinal": "BO3",
+    "final": "BO5"
+  },
+  "reglas": [
+    "Formato oficial Doubles.",
+    "BO3 obligatorio.",
+    "No se puede cambiar equipo durante la serie.",
+    "Captura obligatoria del resultado.",
+    "Si un jugador abandona la liga todos los encuentros restantes cuentan como derrota.",
+    "Conducta antideportiva puede ocasionar descalificación."
+  ]
+}
