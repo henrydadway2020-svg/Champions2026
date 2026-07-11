@@ -16,7 +16,10 @@
         "id": 2,
         "jugadorA": "GAGC",
         "jugadorB": "Bryvil",
-        "resultado": null
+        "resultado": {
+          "ganador": "Bryvil",
+          "marcador": "2-0"
+        }
       },
       {
         "id": 3,
