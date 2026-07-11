@@ -19,6 +19,7 @@
     <div class="brand"><span class="dot"></span> Champions Hub · Admin</div>
     <nav class="links">
       <a href="#config">Conexión</a>
+      <a href="#liga-admin">Liga Regular</a>
       <a href="#torneos">Torneos</a>
       <a href="#tierlist">Tier List</a>
       <a href="#equipos">Equipos</a>
@@ -52,6 +53,73 @@
   </section>
 
   <div id="adminContent" style="display:none;">
+
+    <section id="liga-admin">
+      <div class="section-head">
+        <div><span class="eyebrow">Liga Regular</span><h2>Battle Champions League</h2></div>
+      </div>
+
+      <div id="ligaGateBox"></div>
+
+      <div id="ligaAdminContent" style="display:none;">
+
+        <div class="hud-box config-box">
+          <h3>Configuración de temporada</h3>
+          <p class="hint">Estos datos alimentan el encabezado de la Liga Regular en el sitio público.</p>
+          <div class="field-row">
+            <div class="field"><label>Nombre de la liga</label><input id="lcNombre" placeholder="BATTLE CHAMPIONS LEAGUE"></div>
+            <div class="field"><label>Nombre de temporada</label><input id="lcTemporada" placeholder="Liga Regular - Temporada 1"></div>
+          </div>
+          <div class="field-row">
+            <div class="field"><label>Formato</label>
+              <select id="lcFormato"><option value="doubles">Doubles</option><option value="singles">Singles</option></select>
+            </div>
+            <div class="field"><label>Mejor de (fase regular)</label>
+              <select id="lcBo"><option value="BO1">BO1</option><option value="BO3">BO3</option><option value="BO5">BO5</option></select>
+            </div>
+          </div>
+          <div class="field-row">
+            <div class="field"><label>Premio 1er lugar</label><input id="lcPremio1" placeholder="Ej. Floette"></div>
+            <div class="field"><label>Premio 2do lugar</label><input id="lcPremio2" placeholder="Ej. Archaludon Shiny"></div>
+          </div>
+          <div class="field">
+            <label>Reglas</label>
+            <div class="reglas-editor" id="reglasEditor"></div>
+            <button class="btn btn--ghost btn--sm" type="button" onclick="addReglaRow()">+ Agregar regla</button>
+          </div>
+          <div class="modal-actions" style="justify-content:flex-start; margin-top:16px;">
+            <button class="btn btn--primary btn--sm" onclick="saveLigaConfig()">Guardar configuración</button>
+          </div>
+        </div>
+
+        <div class="hud-box config-box">
+          <h3>Jugadores</h3>
+          <p class="hint">Marca a un jugador como retirado si abandona la liga: sus encuentros pendientes cuentan automáticamente como derrota. Cambiar el nick no actualiza partidos ya jugados con el nombre anterior.</p>
+          <div class="jugadores-admin-grid" id="jugadoresAdminGrid"></div>
+          <div class="modal-actions" style="justify-content:flex-start; margin-top:16px;">
+            <button class="btn btn--primary btn--sm" onclick="saveLigaJugadores()">Guardar jugadores</button>
+          </div>
+        </div>
+
+        <div class="hud-box config-box">
+          <h3>Calendario — 15 fechas</h3>
+          <p class="hint">Registra el resultado de cada serie. La Tabla General, las estadísticas y los playoffs del sitio público se actualizan solos, sin recargar la página.</p>
+          <div id="ligaCalendarAdminBox"></div>
+        </div>
+
+        <div class="hud-box config-box" id="ligaPlayoffsAdminBox"></div>
+
+        <div class="hud-box config-box" style="border-color:var(--red);">
+          <h3 style="color:var(--red);">Zona de riesgo</h3>
+          <p class="hint">Estas acciones afectan a toda la temporada.</p>
+          <div class="modal-actions" style="justify-content:flex-start;">
+            <button class="btn btn--ghost btn--sm" style="color:var(--red); border-color:var(--red);" onclick="resetLigaTemporada()">Reiniciar temporada</button>
+            <button class="btn btn--ghost btn--sm" onclick="nuevaLigaTemporada()">Crear nueva temporada</button>
+          </div>
+        </div>
+
+      </div>
+    </section>
 
     <section id="torneos">
       <div class="section-head">
@@ -134,14 +202,32 @@ const FILES = {
   tiers: 'data/tiers.json',
   equipos: 'data/equipos.json',
   pokedex_builds: 'data/pokedex_builds.json',
-  pokedex_species: 'data/pokedex_species.json'
+  pokedex_species: 'data/pokedex_species.json',
+  liga_config: 'data/liga_config.json',
+  liga_jugadores: 'data/liga_jugadores.json',
+  liga_calendario: 'data/liga_calendario.json',
+  liga_playoffs: 'data/liga_playoffs.json',
+  liga_historial: 'data/liga_historial.json'
 };
 const DEFAULTS = {
   torneos: [],
   tiers: { singles:{}, doubles:{} },
   equipos: { singles:[], doubles:[] },
   pokedex_builds: {},
-  pokedex_species: []
+  pokedex_species: [],
+  liga_config: {
+    temporadaNumero: 1, temporadaNombre: 'Liga Regular - Temporada 1', ligaNombre: 'BATTLE CHAMPIONS LEAGUE',
+    formato: 'doubles', bo: 'BO3', totalJugadores: 0, totalFechas: 0, estado: 'en_curso',
+    puntos: { victoria:3, derrota:0 },
+    desempate: ['Enfrentamiento directo','Diferencia de juegos (BO3)','Mayor cantidad de victorias','Sorteo'],
+    premios: { primero:'', segundo:'' },
+    playoffsFormato: { semifinal:'BO3', final:'BO5' },
+    reglas: []
+  },
+  liga_jugadores: [],
+  liga_calendario: [],
+  liga_playoffs: { generado:false, semifinal:[], final:null },
+  liga_historial: []
 };
 let SHAS = {};
 
@@ -152,6 +238,11 @@ let editingTorneoIndex = null;
 let editingTeamIndex = null;
 let editingTeamFormato = 'singles';
 let formMons = [];
+
+/* Liga Regular - Temporada (módulo nuevo) */
+let LIGA_CONFIG = {}, LIGA_JUGADORES = [], LIGA_CALENDARIO = [], LIGA_PLAYOFFS = {}, LIGA_HISTORIAL = [];
+let ligaReglasDraft = [];
+const LIGA_PASS_KEY = 'liga_admin_pass_hash';
 
 const SPRITE_BASE = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/";
 const sprite = dex => `${SPRITE_BASE}${dex}.png`;
@@ -239,8 +330,9 @@ async function connectAndLoad(){
   localStorage.setItem(CONFIG_KEY, JSON.stringify(CONFIG));
   setStatus('Conectando...', null);
   try{
-    [TORNEOS, TIERS, EQUIPOS, POKEDEX_SPECIES, POKEDEX_BUILDS] = await Promise.all([
-      loadFile('torneos'), loadFile('tiers'), loadFile('equipos'), loadFile('pokedex_species'), loadFile('pokedex_builds')
+    [TORNEOS, TIERS, EQUIPOS, POKEDEX_SPECIES, POKEDEX_BUILDS, LIGA_CONFIG, LIGA_JUGADORES, LIGA_CALENDARIO, LIGA_PLAYOFFS, LIGA_HISTORIAL] = await Promise.all([
+      loadFile('torneos'), loadFile('tiers'), loadFile('equipos'), loadFile('pokedex_species'), loadFile('pokedex_builds'),
+      loadFile('liga_config'), loadFile('liga_jugadores'), loadFile('liga_calendario'), loadFile('liga_playoffs'), loadFile('liga_historial')
     ]);
     document.getElementById('adminContent').style.display = 'block';
     setStatus(`✓ Conectado a ${CONFIG.owner}/${CONFIG.repo} (${CONFIG.branch})`, true);
@@ -249,6 +341,7 @@ async function connectAndLoad(){
     renderEquipos('singles');
     renderPokedex('');
     renderSpeciesAdmin();
+    renderLigaGate();
   }catch(e){
     setStatus('✕ No se pudo conectar: ' + e.message, false);
   }
@@ -651,6 +744,389 @@ async function deleteSpecies(i){
   POKEDEX_SPECIES.splice(i, 1);
   await persist('pokedex_species', POKEDEX_SPECIES, `Quita especie del roster: ${nombre}`);
   renderSpeciesAdmin();
+}
+
+/* ============================================================
+   LIGA REGULAR — TEMPORADA (módulo nuevo, no toca nada de arriba)
+   ============================================================ */
+
+async function sha256Hex(str){
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+function renderLigaGate(){
+  const box = document.getElementById('ligaGateBox');
+  const hasPass = !!localStorage.getItem(LIGA_PASS_KEY);
+  document.getElementById('ligaAdminContent').style.display = 'none';
+  if(!hasPass){
+    box.innerHTML = `
+      <div class="hud-box liga-gate">
+        <h3>Configura una contraseña</h3>
+        <p class="hint">Protege el panel de la Liga Regular en este navegador. No reemplaza tu token de GitHub, que sigue siendo indispensable para guardar cualquier cambio.</p>
+        <div class="field"><label>Nueva contraseña</label><input type="password" id="ligaNewPass"></div>
+        <button class="btn btn--primary btn--sm" onclick="setLigaPassword()">Guardar contraseña</button>
+      </div>`;
+  } else {
+    box.innerHTML = `
+      <div class="hud-box liga-gate">
+        <h3>Panel protegido</h3>
+        <p class="hint">Ingresa la contraseña de la Liga Regular para continuar.</p>
+        <div class="field"><label>Contraseña</label><input type="password" id="ligaEnterPass"></div>
+        <div class="modal-actions" style="justify-content:flex-start;">
+          <button class="btn btn--primary btn--sm" onclick="checkLigaPassword()">Entrar</button>
+          <button class="btn btn--ghost btn--sm" onclick="forgetLigaPassword()">Olvidar contraseña</button>
+        </div>
+      </div>`;
+  }
+}
+async function setLigaPassword(){
+  const val = document.getElementById('ligaNewPass').value;
+  if(!val || val.length < 4){ alert('Usa una contraseña de al menos 4 caracteres.'); return; }
+  localStorage.setItem(LIGA_PASS_KEY, await sha256Hex(val));
+  unlockLiga();
+}
+async function checkLigaPassword(){
+  const val = document.getElementById('ligaEnterPass').value;
+  if(await sha256Hex(val) === localStorage.getItem(LIGA_PASS_KEY)) unlockLiga();
+  else alert('Contraseña incorrecta.');
+}
+function forgetLigaPassword(){
+  if(!confirm('¿Olvidar la contraseña de la Liga Regular en este navegador?')) return;
+  localStorage.removeItem(LIGA_PASS_KEY);
+  renderLigaGate();
+}
+function unlockLiga(){
+  document.getElementById('ligaGateBox').innerHTML =
+    `<div class="modal-actions" style="justify-content:flex-start;"><button class="btn btn--ghost btn--sm" onclick="renderLigaGate()">🔒 Bloquear panel de Liga</button></div>`;
+  document.getElementById('ligaAdminContent').style.display = 'block';
+  renderLigaAdmin();
+}
+
+function ligaPuntosVictoria(){ return (LIGA_CONFIG.puntos && LIGA_CONFIG.puntos.victoria) || 3; }
+
+function computeLigaStandings(){
+  const stats = {};
+  (LIGA_JUGADORES || []).forEach(j => {
+    stats[j.nick] = { nick:j.nick, activo:j.activo !== false, pj:0, pg:0, pp:0, jg:0, jp:0, last5:[], h2h:{} };
+  });
+  (LIGA_CALENDARIO || []).forEach(f => {
+    (f.partidos || []).forEach(p => {
+      const A = stats[p.jugadorA], B = stats[p.jugadorB];
+      if(!A || !B) return;
+      let ga, gb;
+      if(p.resultado){ ga = p.resultado.ga; gb = p.resultado.gb; }
+      else if(!A.activo || !B.activo){
+        if(!A.activo && !B.activo) return;
+        ga = A.activo ? 2 : 0;
+        gb = A.activo ? 0 : 2;
+      } else return;
+      A.pj++; B.pj++;
+      A.jg += ga; A.jp += gb;
+      B.jg += gb; B.jp += ga;
+      const aGana = ga > gb;
+      if(aGana){ A.pg++; B.pp++; A.last5.push('W'); B.last5.push('L'); }
+      else{ B.pg++; A.pp++; B.last5.push('W'); A.last5.push('L'); }
+      A.h2h[p.jugadorB] = aGana ? 'W' : 'L';
+      B.h2h[p.jugadorA] = aGana ? 'L' : 'W';
+    });
+  });
+  const arr = Object.values(stats).map(s => ({
+    ...s, diff: s.jg - s.jp, pts: s.pg * ligaPuntosVictoria(),
+    pct: s.pj ? Math.round((s.pg / s.pj) * 1000) / 10 : 0, last5: s.last5.slice(-5)
+  }));
+  arr.sort((x, y) => {
+    if(y.pts !== x.pts) return y.pts - x.pts;
+    if(x.h2h[y.nick] === 'W') return -1;
+    if(x.h2h[y.nick] === 'L') return 1;
+    if(y.diff !== x.diff) return y.diff - x.diff;
+    if(y.pg !== x.pg) return y.pg - x.pg;
+    return x.nick.localeCompare(y.nick);
+  });
+  return arr;
+}
+
+function renderReglasEditor(){
+  document.getElementById('reglasEditor').innerHTML = ligaReglasDraft.map((r, i) => `
+    <div class="reglas-editor-row">
+      <input value="${escapeAttr(r)}" oninput="ligaReglasDraft[${i}]=this.value">
+      <button type="button" class="icon-btn danger" onclick="removeReglaRow(${i})">✕</button>
+    </div>
+  `).join('') || '<p style="color:var(--text-muted); font-size:12px;">Sin reglas todavía.</p>';
+}
+function addReglaRow(){ ligaReglasDraft.push(''); renderReglasEditor(); }
+function removeReglaRow(i){ ligaReglasDraft.splice(i, 1); renderReglasEditor(); }
+
+function fillLigaConfigForm(){
+  document.getElementById('lcNombre').value = LIGA_CONFIG.ligaNombre || '';
+  document.getElementById('lcTemporada').value = LIGA_CONFIG.temporadaNombre || '';
+  document.getElementById('lcFormato').value = LIGA_CONFIG.formato || 'doubles';
+  document.getElementById('lcBo').value = LIGA_CONFIG.bo || 'BO3';
+  document.getElementById('lcPremio1').value = (LIGA_CONFIG.premios && LIGA_CONFIG.premios.primero) || '';
+  document.getElementById('lcPremio2').value = (LIGA_CONFIG.premios && LIGA_CONFIG.premios.segundo) || '';
+  ligaReglasDraft = [...(LIGA_CONFIG.reglas || [])];
+  renderReglasEditor();
+}
+async function saveLigaConfig(){
+  LIGA_CONFIG.ligaNombre = document.getElementById('lcNombre').value.trim();
+  LIGA_CONFIG.temporadaNombre = document.getElementById('lcTemporada').value.trim();
+  LIGA_CONFIG.formato = document.getElementById('lcFormato').value;
+  LIGA_CONFIG.bo = document.getElementById('lcBo').value;
+  LIGA_CONFIG.premios = {
+    primero: document.getElementById('lcPremio1').value.trim(),
+    segundo: document.getElementById('lcPremio2').value.trim()
+  };
+  LIGA_CONFIG.reglas = ligaReglasDraft.map(r => r.trim()).filter(Boolean);
+  await persist('liga_config', LIGA_CONFIG, 'Actualiza configuración de la Liga Regular');
+}
+
+function renderJugadoresAdmin(){
+  document.getElementById('jugadoresAdminGrid').innerHTML = (LIGA_JUGADORES || []).map((j, i) => `
+    <div class="jugador-admin-row">
+      <input value="${escapeAttr(j.nick)}" oninput="LIGA_JUGADORES[${i}].nick=this.value">
+      <input value="${escapeAttr(j.telefono || '')}" placeholder="Teléfono" oninput="LIGA_JUGADORES[${i}].telefono=this.value">
+      <label style="display:flex; align-items:center; gap:6px; font-family:var(--font-mono); font-size:11px; white-space:nowrap;">
+        <input type="checkbox" ${j.activo !== false ? 'checked' : ''} onchange="LIGA_JUGADORES[${i}].activo=this.checked"> Activo
+      </label>
+    </div>
+  `).join('');
+}
+async function saveLigaJugadores(){
+  await persist('liga_jugadores', LIGA_JUGADORES, 'Actualiza jugadores de la Liga Regular');
+  renderLigaCalendarAdmin();
+  renderLigaPlayoffsAdmin();
+}
+
+function renderLigaCalendarAdmin(){
+  const box = document.getElementById('ligaCalendarAdminBox');
+  box.innerHTML = (LIGA_CALENDARIO || []).map(f => {
+    const jugados = f.partidos.filter(p => p.resultado).length;
+    return `
+      <div class="hud-box matchday-card">
+        <div class="matchday-head">
+          <h4>Fecha ${f.fecha}</h4>
+          <div style="display:flex; gap:8px; align-items:center;">
+            <span class="tag ${f.abierta ? 'tag--live' : ''}">${f.abierta ? 'Abierta' : 'Cerrada'}</span>
+            <span class="tag">${jugados}/${f.partidos.length}</span>
+            <button class="btn btn--ghost btn--sm" onclick="toggleFechaAbierta(${f.fecha})">${f.abierta ? 'Cerrar fecha' : 'Abrir fecha'}</button>
+          </div>
+        </div>
+        <div class="match-list">
+          ${f.partidos.map(p => `
+            <div class="match-row">
+              <span class="mp-name">${escapeHtml(p.jugadorA)}</span>
+              <select id="res-${p.id}">
+                <option value="" ${!p.resultado ? 'selected' : ''}>Pendiente</option>
+                <option value="2-0" ${p.resultado && p.resultado.ga === 2 && p.resultado.gb === 0 ? 'selected' : ''}>2-0</option>
+                <option value="2-1" ${p.resultado && p.resultado.ga === 2 && p.resultado.gb === 1 ? 'selected' : ''}>2-1</option>
+                <option value="1-2" ${p.resultado && p.resultado.ga === 1 && p.resultado.gb === 2 ? 'selected' : ''}>1-2</option>
+                <option value="0-2" ${p.resultado && p.resultado.ga === 0 && p.resultado.gb === 2 ? 'selected' : ''}>0-2</option>
+              </select>
+              <span class="mp-name">${escapeHtml(p.jugadorB)}</span>
+              <button class="btn btn--primary btn--sm" onclick="saveMatchResult(${p.id})">Guardar</button>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+async function saveMatchResult(id){
+  let target = null, fechaObj = null;
+  for(const f of LIGA_CALENDARIO){
+    const p = f.partidos.find(x => x.id === id);
+    if(p){ target = p; fechaObj = f; break; }
+  }
+  if(!target) return;
+  const val = document.getElementById('res-' + id).value;
+  target.resultado = val ? { ga:Number(val.split('-')[0]), gb:Number(val.split('-')[1]) } : null;
+  await persist('liga_calendario', LIGA_CALENDARIO, `Resultado Fecha ${fechaObj.fecha}: ${target.jugadorA} ${val || 'pendiente'} ${target.jugadorB}`);
+  renderLigaCalendarAdmin();
+  renderLigaPlayoffsAdmin();
+}
+
+async function toggleFechaAbierta(fecha){
+  const f = LIGA_CALENDARIO.find(x => x.fecha === fecha);
+  if(!f) return;
+  f.abierta = !f.abierta;
+  await persist('liga_calendario', LIGA_CALENDARIO, `${f.abierta ? 'Abre' : 'Cierra'} Fecha ${fecha}`);
+  renderLigaCalendarAdmin();
+}
+
+function allLigaMatchesPlayed(){
+  return (LIGA_CALENDARIO || []).length > 0 && LIGA_CALENDARIO.every(f => f.partidos.every(p => p.resultado));
+}
+
+function sfBoOptions(p){
+  return `
+    <option value="" ${!p.resultado ? 'selected' : ''}>Pendiente</option>
+    <option value="2-0" ${p.resultado && p.resultado.ga === 2 && p.resultado.gb === 0 ? 'selected' : ''}>2-0</option>
+    <option value="2-1" ${p.resultado && p.resultado.ga === 2 && p.resultado.gb === 1 ? 'selected' : ''}>2-1</option>
+    <option value="1-2" ${p.resultado && p.resultado.ga === 1 && p.resultado.gb === 2 ? 'selected' : ''}>1-2</option>
+    <option value="0-2" ${p.resultado && p.resultado.ga === 0 && p.resultado.gb === 2 ? 'selected' : ''}>0-2</option>`;
+}
+function finalBoOptions(p){
+  const r = p && p.resultado;
+  const opt = (a, b) => `<option value="${a}-${b}" ${r && r.ga === a && r.gb === b ? 'selected' : ''}>${a}-${b}</option>`;
+  return `<option value="" ${!r ? 'selected' : ''}>Pendiente</option>` +
+    opt(3,0) + opt(3,1) + opt(3,2) + opt(2,3) + opt(1,3) + opt(0,3);
+}
+
+function renderLigaPlayoffsAdmin(){
+  const box = document.getElementById('ligaPlayoffsAdminBox');
+  if(!LIGA_PLAYOFFS.generado){
+    const ready = allLigaMatchesPlayed();
+    box.innerHTML = `
+      <h3>Playoffs</h3>
+      <p class="hint">${ready ? 'Las 15 fechas están completas — ya puedes generar el Top 4 y las semifinales.' : 'Se habilita cuando las 15 fechas tengan resultado.'}</p>
+      <button class="btn btn--primary btn--sm" ${ready ? '' : 'disabled'} onclick="generarPlayoffs()">Generar Top 4 y Semifinales</button>
+    `;
+    return;
+  }
+  const sf = LIGA_PLAYOFFS.semifinal || [];
+  const final = LIGA_PLAYOFFS.final;
+  let html = `<h3>Playoffs</h3><div class="match-list">`;
+  sf.forEach((p, i) => {
+    html += `
+      <div class="match-row">
+        <span class="mp-name">${escapeHtml(p.jugadorA)}</span>
+        <select id="sf-${i}">${sfBoOptions(p)}</select>
+        <span class="mp-name">${escapeHtml(p.jugadorB)}</span>
+        <button class="btn btn--primary btn--sm" onclick="saveSfResult(${i})">Guardar</button>
+      </div>`;
+  });
+  html += `</div>`;
+  const sfDone = sf.length === 2 && sf.every(p => p.resultado);
+  if(sfDone && !final){
+    html += `<div class="modal-actions" style="justify-content:flex-start; margin-top:14px;"><button class="btn btn--primary btn--sm" onclick="generarFinal()">Generar Final</button></div>`;
+  }
+  if(final){
+    html += `
+      <h4 style="margin-top:20px; text-transform:uppercase; font-size:14px;">Final (BO5)</h4>
+      <div class="match-row">
+        <span class="mp-name">${escapeHtml(final.jugadorA)}</span>
+        <select id="final-res">${finalBoOptions(final)}</select>
+        <span class="mp-name">${escapeHtml(final.jugadorB)}</span>
+        <button class="btn btn--primary btn--sm" onclick="saveFinalResult()">Guardar</button>
+      </div>`;
+    if(final.resultado){
+      html += `<p class="hint" style="margin-top:10px;">✓ Temporada finalizada. Usa "Crear nueva temporada" cuando quieras arrancar la siguiente.</p>`;
+    }
+  }
+  box.innerHTML = html;
+}
+
+async function generarPlayoffs(){
+  const arr = computeLigaStandings();
+  const top4 = arr.slice(0, 4);
+  if(top4.length < 4){ alert('No hay suficientes jugadores para generar el Top 4.'); return; }
+  LIGA_PLAYOFFS = {
+    generado: true,
+    semifinal: [
+      { jugadorA: top4[0].nick, jugadorB: top4[3].nick, resultado: null },
+      { jugadorA: top4[1].nick, jugadorB: top4[2].nick, resultado: null }
+    ],
+    final: null
+  };
+  LIGA_CONFIG.estado = 'playoffs';
+  await persist('liga_playoffs', LIGA_PLAYOFFS, 'Genera Top 4 y semifinales');
+  await persist('liga_config', LIGA_CONFIG, 'La Liga Regular entra en fase de playoffs');
+  renderLigaPlayoffsAdmin();
+}
+
+async function saveSfResult(i){
+  const val = document.getElementById('sf-' + i).value;
+  LIGA_PLAYOFFS.semifinal[i].resultado = val ? { ga:Number(val.split('-')[0]), gb:Number(val.split('-')[1]) } : null;
+  await persist('liga_playoffs', LIGA_PLAYOFFS, `Resultado Semifinal ${i + 1}`);
+  renderLigaPlayoffsAdmin();
+}
+
+async function generarFinal(){
+  const sf = LIGA_PLAYOFFS.semifinal;
+  const ganador = (p) => p.resultado.ga > p.resultado.gb ? p.jugadorA : p.jugadorB;
+  LIGA_PLAYOFFS.final = { jugadorA: ganador(sf[0]), jugadorB: ganador(sf[1]), resultado: null };
+  await persist('liga_playoffs', LIGA_PLAYOFFS, 'Genera la Final');
+  renderLigaPlayoffsAdmin();
+}
+
+async function saveFinalResult(){
+  const val = document.getElementById('final-res').value;
+  LIGA_PLAYOFFS.final.resultado = val ? { ga:Number(val.split('-')[0]), gb:Number(val.split('-')[1]) } : null;
+  await persist('liga_playoffs', LIGA_PLAYOFFS, 'Resultado de la Final');
+  if(LIGA_PLAYOFFS.final.resultado){
+    LIGA_CONFIG.estado = 'finalizada';
+    await persist('liga_config', LIGA_CONFIG, 'Finaliza la temporada de la Liga Regular');
+  }
+  renderLigaPlayoffsAdmin();
+}
+
+function generateRoundRobinJS(names){
+  const n = names.length;
+  if(n < 2) return [];
+  let players = [...Array(n).keys()];
+  const rounds = [];
+  const totalRondas = (n % 2 === 0) ? n - 1 : n;
+  const withBye = n % 2 !== 0;
+  if(withBye) players.push(null);
+  const total = players.length;
+  for(let r = 0; r < totalRondas; r++){
+    const pairs = [];
+    for(let i = 0; i < total / 2; i++){
+      const a = players[i], b = players[total - 1 - i];
+      if(a !== null && b !== null) pairs.push([a, b]);
+    }
+    rounds.push(pairs);
+    players = [players[0], players[players.length - 1], ...players.slice(1, -1)];
+  }
+  let matchId = 1;
+  return rounds.map((pairs, idx) => ({
+    fecha: idx + 1,
+    abierta: idx === 0,
+    partidos: pairs.map(([a, b]) => ({ id: matchId++, jugadorA: names[a], jugadorB: names[b], resultado: null }))
+  }));
+}
+
+async function resetLigaTemporada(){
+  if(!confirm('Esto borrará todos los resultados de la temporada actual, reabrirá la Fecha 1 y reactivará a todos los jugadores. ¿Continuar?')) return;
+  LIGA_CALENDARIO.forEach(f => { f.abierta = f.fecha === 1; f.partidos.forEach(p => p.resultado = null); });
+  LIGA_JUGADORES.forEach(j => j.activo = true);
+  LIGA_PLAYOFFS = { generado:false, semifinal:[], final:null };
+  LIGA_CONFIG.estado = 'en_curso';
+  await persist('liga_calendario', LIGA_CALENDARIO, 'Reinicia la temporada de la Liga Regular');
+  await persist('liga_jugadores', LIGA_JUGADORES, 'Reactiva jugadores de la Liga Regular');
+  await persist('liga_playoffs', LIGA_PLAYOFFS, 'Reinicia playoffs de la Liga Regular');
+  await persist('liga_config', LIGA_CONFIG, 'Reinicia estado de la Liga Regular');
+  renderLigaAdmin();
+}
+
+async function nuevaLigaTemporada(){
+  if(!confirm('Se archivará la tabla final de esta temporada y se generará un calendario nuevo con los mismos jugadores. ¿Continuar?')) return;
+  LIGA_HISTORIAL.push({
+    temporadaNumero: LIGA_CONFIG.temporadaNumero || 1,
+    temporadaNombre: LIGA_CONFIG.temporadaNombre || '',
+    tablaFinal: computeLigaStandings(),
+    playoffs: LIGA_PLAYOFFS
+  });
+  LIGA_CONFIG.temporadaNumero = (LIGA_CONFIG.temporadaNumero || 1) + 1;
+  LIGA_CONFIG.temporadaNombre = `Liga Regular - Temporada ${LIGA_CONFIG.temporadaNumero}`;
+  LIGA_CONFIG.estado = 'en_curso';
+  LIGA_JUGADORES.forEach(j => j.activo = true);
+  LIGA_CALENDARIO = generateRoundRobinJS(LIGA_JUGADORES.map(j => j.nick));
+  LIGA_PLAYOFFS = { generado:false, semifinal:[], final:null };
+  await persist('liga_historial', LIGA_HISTORIAL, 'Archiva temporada anterior de la Liga Regular');
+  await persist('liga_config', LIGA_CONFIG, 'Crea nueva temporada de la Liga Regular');
+  await persist('liga_jugadores', LIGA_JUGADORES, 'Reinicia jugadores para la nueva temporada');
+  await persist('liga_calendario', LIGA_CALENDARIO, 'Genera calendario de la nueva temporada');
+  await persist('liga_playoffs', LIGA_PLAYOFFS, 'Reinicia playoffs para la nueva temporada');
+  renderLigaAdmin();
+}
+
+function renderLigaAdmin(){
+  fillLigaConfigForm();
+  renderJugadoresAdmin();
+  renderLigaCalendarAdmin();
+  renderLigaPlayoffsAdmin();
 }
 
 /* ============================================================
