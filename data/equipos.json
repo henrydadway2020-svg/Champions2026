@@ -29,8 +29,8 @@
       "mons": [
         { "nombre": "Torkoal", "dex": 324, "item": "Charcoal", "nota": "Drought, setter de sol" },
         { "nombre": "Incineroar", "dex": 727, "item": "Sitrus Berry", "nota": "Fake Out + Intimidate" },
-        { "nombre": "Iron Hands", "dex": 992, "item": "Assault Vest", "nota": "Bulk físico, Fake Out" },
-        { "nombre": "Flutter Mane", "dex": 987, "item": "Focus Sash", "nota": "Sweeper especial rápido" }
+        { "nombre": "Mega Charizard Y", "dex": 6, "item": "Charizardite Y", "nota": "Solar Power, arrasa bajo el sol propio" },
+        { "nombre": "Whimsicott", "dex": 547, "item": "Focus Sash", "nota": "Prankster, Tailwind de apoyo" }
       ]
     },
     {

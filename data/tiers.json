@@ -1,39 +1,442 @@
 {
   "singles": {
     "S": [
-      { "nombre": "Hippowdon", "dex": 450, "nota": "Bulk + hazards + Slack Off" },
-      { "nombre": "Garchomp", "dex": 445, "nota": "Ataque físico alto, gran velocidad" }
+      {
+        "nombre": "Garchomp",
+        "dex": 445,
+        "nota": "Rey de la velocidad física, cierra partidas con Choice Scarf"
+      },
+      {
+        "nombre": "Sneasler",
+        "dex": 903,
+        "nota": "Unburden + Close Combat, sweeper explosivo"
+      },
+      {
+        "nombre": "Primarina",
+        "dex": 730,
+        "nota": "Muro especial con Moonblast + recuperación"
+      },
+      {
+        "nombre": "Meowscarada",
+        "dex": 908,
+        "nota": "Protean le da STAB perfecto en cada golpe"
+      },
+      {
+        "nombre": "Kingambit",
+        "dex": 983,
+        "nota": "Supreme Overlord, Sucker Punch prioritario"
+      },
+      {
+        "nombre": "Kangaskhan",
+        "dex": 115,
+        "nota": "Base flexible, brutal al Mega Evolucionar"
+      },
+      {
+        "nombre": "Mega Gengar",
+        "dex": 94,
+        "mega": true,
+        "nota": "Shadow Tag atrapa amenazas, sweeper especial letal"
+      },
+      {
+        "nombre": "Mega Delphox",
+        "dex": 655,
+        "mega": true,
+        "nota": "La Mega mejor valorada de la temporada, Magician + coverage especial"
+      }
     ],
     "A": [
-      { "nombre": "Dragapult", "dex": 887, "nota": "Sweeper rápido, gran coverage" },
-      { "nombre": "Gholdengo", "dex": 1000, "nota": "Bulk especial + Recover" },
-      { "nombre": "Urshifu", "dex": 892, "nota": "Rompe estructuras defensivas" }
+      {
+        "nombre": "Charizard",
+        "dex": 6,
+        "nota": "Flexible físico/especial, base ideal para Mega Y"
+      },
+      {
+        "nombre": "Gengar",
+        "dex": 94,
+        "nota": "Presión especial y Sludge Bomb/Shadow Ball"
+      },
+      {
+        "nombre": "Hippowdon",
+        "dex": 450,
+        "nota": "Sand Stream + Stealth Rock, muro físico confiable"
+      },
+      {
+        "nombre": "Pelipper",
+        "dex": 279,
+        "nota": "Drizzle, setter de lluvia consistente"
+      },
+      {
+        "nombre": "Dragonite",
+        "dex": 149,
+        "nota": "Multiscale + Extreme Speed, cierra juegos"
+      },
+      {
+        "nombre": "Clefable",
+        "dex": 36,
+        "nota": "Unaware anula boosts, gran muro mixto"
+      },
+      {
+        "nombre": "Archaludon",
+        "dex": 1018,
+        "nota": "Stamina + Electro Shot, tanque especial"
+      },
+      {
+        "nombre": "Froslass",
+        "dex": 478,
+        "nota": "Spikes + presión especial rápida"
+      },
+      {
+        "nombre": "Starmie",
+        "dex": 121,
+        "nota": "Rapid Spin y coverage especial veloz"
+      },
+      {
+        "nombre": "Greninja",
+        "dex": 658,
+        "nota": "Protean, gran revenge killer especial"
+      },
+      {
+        "nombre": "Mega Charizard Y",
+        "dex": 6,
+        "mega": true,
+        "nota": "Drought + Solar Power, arrasa con Fire Blast/Solar Beam"
+      },
+      {
+        "nombre": "Mega Lucario",
+        "dex": 448,
+        "mega": true,
+        "nota": "Adaptability, coverage físico/especial devastador"
+      },
+      {
+        "nombre": "Mega Dragonite",
+        "dex": 149,
+        "mega": true,
+        "nota": "Multiscale reforzado, sweeper de set-up exclusivo de Champions"
+      }
     ],
     "B": [
-      { "nombre": "Hydreigon", "dex": 635, "nota": "Coverage especial versátil" },
-      { "nombre": "Mimikyu", "dex": 778, "nota": "Disguise entra gratis" }
+      {
+        "nombre": "Basculegion",
+        "dex": 902,
+        "nota": "Adaptability + Wave Crash, forma macho ofensiva"
+      },
+      {
+        "nombre": "Hatterene",
+        "dex": 858,
+        "nota": "Magic Bounce, castiga hazards y status"
+      },
+      {
+        "nombre": "Scizor",
+        "dex": 212,
+        "nota": "Technician + Bullet Punch prioritario"
+      },
+      {
+        "nombre": "Feraligatr",
+        "dex": 160,
+        "nota": "Sheer Force potencia Liquidation"
+      },
+      {
+        "nombre": "Toxapex",
+        "dex": 748,
+        "nota": "Regenerator, muro de agua/veneno"
+      },
+      {
+        "nombre": "Hawlucha",
+        "dex": 701,
+        "nota": "Unburden, explota tras usar el objeto"
+      },
+      {
+        "nombre": "Corviknight",
+        "dex": 823,
+        "nota": "Bulk físico + Roost, hard wall confiable"
+      },
+      {
+        "nombre": "Dragapult",
+        "dex": 887,
+        "nota": "Velocidad altísima, coverage especial amplio"
+      },
+      {
+        "nombre": "Excadrill",
+        "dex": 530,
+        "nota": "Mold Breaker + Piercing Drill en su Mega"
+      },
+      {
+        "nombre": "Mimikyu",
+        "dex": 778,
+        "nota": "Disguise entra gratis, Swords Dance setup"
+      },
+      {
+        "nombre": "Mega Froslass",
+        "dex": 478,
+        "mega": true,
+        "nota": "Snow Warning, Blizzard con 100% de precisión"
+      },
+      {
+        "nombre": "Mega Gyarados",
+        "dex": 130,
+        "mega": true,
+        "nota": "Mold Breaker físico puro, ignora habilidades defensivas"
+      },
+      {
+        "nombre": "Mega Heracross",
+        "dex": 214,
+        "mega": true,
+        "nota": "Skill Link, Pin Missile/Rock Blast garantizados"
+      }
     ],
     "C": [
-      { "nombre": "Ting-Lu", "dex": 1024, "nota": "Muro físico con hazards" }
+      {
+        "nombre": "Hydreigon",
+        "dex": 635,
+        "nota": "Coverage especial muy versátil"
+      },
+      {
+        "nombre": "Tyranitar",
+        "dex": 248,
+        "nota": "Sand Stream, pega fuerte en ambos lados"
+      },
+      {
+        "nombre": "Sylveon",
+        "dex": 700,
+        "nota": "Pixilate potencia Hyper Voice"
+      },
+      {
+        "nombre": "Weavile",
+        "dex": 461,
+        "nota": "Velocidad altísima, Ice Shard prioritario"
+      },
+      {
+        "nombre": "Alolan Ninetales",
+        "dex": 38,
+        "nota": "Snow Warning, Aurora Veil de soporte"
+      },
+      {
+        "nombre": "Mega Glimmora",
+        "dex": 970,
+        "mega": true,
+        "nota": "Toxic Debris castiga contactos con hazards"
+      }
     ]
   },
   "doubles": {
     "S": [
-      { "nombre": "Incineroar", "dex": 727, "nota": "Intimidate + Fake Out, soporte S-tier" },
-      { "nombre": "Rillaboom", "dex": 812, "nota": "Grassy Terrain + prioridad" }
+      {
+        "nombre": "Incineroar",
+        "dex": 727,
+        "nota": "Intimidate + Fake Out, soporte imprescindible en dobles"
+      },
+      {
+        "nombre": "Sneasler",
+        "dex": 903,
+        "nota": "Rompe estructuras defensivas con Close Combat"
+      },
+      {
+        "nombre": "Garchomp",
+        "dex": 445,
+        "nota": "Presión física y velocidad decisiva"
+      },
+      {
+        "nombre": "Eternal Flower Floette",
+        "dex": 670,
+        "nota": "Forma exclusiva, Pollen Puff cura a aliados y daña rivales"
+      },
+      {
+        "nombre": "Mega Floette",
+        "dex": 670,
+        "mega": true,
+        "nota": "La Mega mejor valorada en dobles, soporte curativo total"
+      },
+      {
+        "nombre": "Mega Kangaskhan",
+        "dex": 115,
+        "mega": true,
+        "nota": "Parental Bond duplica cada ataque, presión brutal"
+      }
     ],
     "A": [
-      { "nombre": "Kingambit", "dex": 983, "nota": "Defiant + Sucker Punch, castiga Intimidate" },
-      { "nombre": "Amoonguss", "dex": 591, "nota": "Redirección con Rage Powder" },
-      { "nombre": "Flutter Mane", "dex": 987, "nota": "Velocidad + Moonblast especial" }
+      {
+        "nombre": "Kingambit",
+        "dex": 983,
+        "nota": "Defiant castiga Intimidate rival"
+      },
+      {
+        "nombre": "Sinistcha",
+        "dex": 1013,
+        "nota": "Heatproof + soporte especial defensivo"
+      },
+      {
+        "nombre": "Whimsicott",
+        "dex": 547,
+        "nota": "Prankster, Tailwind y Encore de soporte"
+      },
+      {
+        "nombre": "Charizard",
+        "dex": 6,
+        "nota": "Flexible, base perfecta para Mega Y en sol"
+      },
+      {
+        "nombre": "Wash Rotom",
+        "dex": 479,
+        "nota": "Levitate, resistencias clave y Volt Switch"
+      },
+      {
+        "nombre": "Aerodactyl",
+        "dex": 142,
+        "nota": "Tailwind support con gran velocidad base"
+      },
+      {
+        "nombre": "Pelipper",
+        "dex": 279,
+        "nota": "Drizzle habilita equipos de lluvia"
+      },
+      {
+        "nombre": "Archaludon",
+        "dex": 1018,
+        "nota": "Stamina, tanque especial que crece al recibir golpes"
+      },
+      {
+        "nombre": "Dragonite",
+        "dex": 149,
+        "nota": "Multiscale + Extreme Speed prioritario"
+      },
+      {
+        "nombre": "Basculegion",
+        "dex": 902,
+        "nota": "Rompedor físico con gran poder"
+      },
+      {
+        "nombre": "Farigiraf",
+        "dex": 981,
+        "nota": "Armor Tail bloquea prioridad rival"
+      },
+      {
+        "nombre": "Hatterene",
+        "dex": 858,
+        "nota": "Magic Bounce protege al equipo de status"
+      },
+      {
+        "nombre": "Mega Hawlucha",
+        "dex": 701,
+        "mega": true,
+        "nota": "Unburden, velocidad explosiva tras un turno"
+      },
+      {
+        "nombre": "Mega Scizor",
+        "dex": 212,
+        "mega": true,
+        "nota": "Bullet Punch de prioridad, Technician"
+      },
+      {
+        "nombre": "Mega Feraligatr",
+        "dex": 160,
+        "mega": true,
+        "nota": "Dragonize, habilidad exclusiva de Champions con nuevo coverage"
+      },
+      {
+        "nombre": "Mega Blastoise",
+        "dex": 9,
+        "mega": true,
+        "nota": "Mega Launcher potencia movimientos de onda en dobles"
+      }
     ],
     "B": [
-      { "nombre": "Pelipper", "dex": 279, "nota": "Setter de lluvia, Drizzle" },
-      { "nombre": "Torkoal", "dex": 324, "nota": "Setter de sol, Drought" },
-      { "nombre": "Iron Hands", "dex": 992, "nota": "Bulk físico + Fake Out" }
+      {
+        "nombre": "Milotic",
+        "dex": 350,
+        "nota": "Marvel Scale, gran bulk especial"
+      },
+      {
+        "nombre": "Gardevoir",
+        "dex": 282,
+        "nota": "Trace + Moonblast, presión especial"
+      },
+      {
+        "nombre": "Talonflame",
+        "dex": 663,
+        "nota": "Gale Wings, prioridad de Fuego"
+      },
+      {
+        "nombre": "Corviknight",
+        "dex": 823,
+        "nota": "Mist Ball físico y bulk confiable"
+      },
+      {
+        "nombre": "Volcarona",
+        "dex": 637,
+        "nota": "Quiver Dance, sweeper especial de fuego"
+      },
+      {
+        "nombre": "Sylveon",
+        "dex": 700,
+        "nota": "Hyper Voice pega a ambos rivales"
+      },
+      {
+        "nombre": "Hippowdon",
+        "dex": 450,
+        "nota": "Sand Stream, control de campo en dobles"
+      },
+      {
+        "nombre": "Klefki",
+        "dex": 707,
+        "nota": "Prankster, Reflect/Light Screen de soporte"
+      },
+      {
+        "nombre": "Kangaskhan",
+        "dex": 115,
+        "nota": "Buena base ofensiva incluso sin evolucionar"
+      },
+      {
+        "nombre": "Mega Venusaur",
+        "dex": 3,
+        "mega": true,
+        "nota": "Thick Fat reduce daño de Fuego y Hielo"
+      },
+      {
+        "nombre": "Mega Charizard X",
+        "dex": 6,
+        "mega": true,
+        "nota": "Tough Claws potencia golpes de contacto"
+      },
+      {
+        "nombre": "Mega Clefable",
+        "dex": 36,
+        "mega": true,
+        "nota": "Unaware, muro que ignora cambios de stats"
+      },
+      {
+        "nombre": "Mega Meganium",
+        "dex": 154,
+        "mega": true,
+        "nota": "Mega Sol: efectos de sol permanentes sin cambiar el clima"
+      }
     ],
     "C": [
-      { "nombre": "Tornadus", "dex": 641, "nota": "Tailwind support, Prankster" }
+      {
+        "nombre": "Torkoal",
+        "dex": 324,
+        "nota": "Drought, setter de sol alternativo"
+      },
+      {
+        "nombre": "Amoonguss",
+        "dex": 591,
+        "nota": "Rage Powder, redirección clásica"
+      },
+      {
+        "nombre": "Rillaboom",
+        "dex": 812,
+        "nota": "Grassy Terrain + prioridad con Grassy Glide"
+      },
+      {
+        "nombre": "Tornadus",
+        "dex": 641,
+        "nota": "Prankster, Tailwind de apoyo rápido"
+      },
+      {
+        "nombre": "Mega Emboar",
+        "dex": 500,
+        "mega": true,
+        "nota": "Reckless potencia golpes de alto retroceso"
+      }
     ]
   }
 }
