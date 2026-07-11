@@ -31,7 +31,10 @@
         "id": 5,
         "jugadorA": "Skaires",
         "jugadorB": "Akira",
-        "resultado": null
+        "resultado": {
+          "ga": 0,
+          "gb": 2
+        }
       },
       {
         "id": 6,
