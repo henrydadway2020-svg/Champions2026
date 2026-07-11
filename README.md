@@ -12,8 +12,18 @@ champions-hub/
     ├── tiers.json
     ├── equipos.json
     ├── pokedex_builds.json
-    └── pokedex_species.json
+    ├── pokedex_species.json
+    ├── liga_config.json
+    ├── liga_calendario.json
+    ├── liga_jugadores.json
+    └── liga_playoffs.json   ← se crea solo al guardar el primer resultado de playoffs
 ```
+
+## Tabla de posiciones y Playoffs
+
+La **tabla general de posiciones** se calcula sola con los resultados que capturas en Liga (fecha por fecha) — no hay nada que llenar aparte. Se ordena por partidos ganados y, en caso de empate, por porcentaje de victorias.
+
+Los **playoffs** (Top 4) se desbloquean automáticamente al terminar las fechas de la fase regular, con el emparejamiento clásico #1 vs #4 y #2 vs #3. Desde `admin.html → Playoffs` solo indicas quién ganó cada llave (semifinales, final y tercer puesto); el sitio público arma el bracket solo.
 
 `index.html` **solo lee** estos JSON. `admin.html` es la única forma de escribirlos, y solo funciona si tienes un token de GitHub con permiso de escritura sobre tu repositorio — así que aunque alguien encuentre la URL de `admin.html`, sin tu token no puede guardar nada.
 

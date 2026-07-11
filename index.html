@@ -17,6 +17,7 @@
     <nav class="links">
       <a href="#torneos">Torneos</a>
       <a href="#liga">Liga</a>
+      <a href="#playoffs">Playoffs</a>
       <a href="#tierlist">Tier List</a>
       <a href="#pokedex">Pokédex</a>
       <a href="#equipos">Equipos</a>
@@ -62,7 +63,22 @@
       </div>
     </div>
     <div class="hud-box liga-header" id="ligaHeader"></div>
+    <h3 class="subsection-title">Tabla general de posiciones</h3>
+    <div class="standings-wrap" id="standingsWrap"></div>
+    <h3 class="subsection-title">Calendario de fechas</h3>
     <div class="fecha-grid" id="ligaCalendario"></div>
+  </div>
+</section>
+
+<section id="playoffs">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <span class="eyebrow">Top 4</span>
+        <h2>Playoffs</h2>
+      </div>
+    </div>
+    <div id="playoffsContainer"></div>
   </div>
 </section>
 
@@ -146,6 +162,7 @@ let POKEDEX_BUILDS = {};
 let LIGA_CONFIG = {};
 let LIGA_CALENDARIO = [];
 let LIGA_JUGADORES = [];
+let LIGA_PLAYOFFS = {};
 
 let currentTierFmt = 'singles';
 let currentTeamFmt = 'singles';
@@ -159,9 +176,17 @@ async function loadJSON(path){
   return res.json();
 }
 
+// Igual que loadJSON, pero si el archivo todavía no existe en el repo
+// (por ejemplo liga_playoffs.json antes del primer guardado) no rompe
+// la carga del resto de la página — regresa el valor por defecto.
+async function loadJSONSafe(path, fallback){
+  try{ return await loadJSON(path); }
+  catch(e){ return fallback; }
+}
+
 async function loadAllData(){
   try{
-    [TORNEOS, TIERS, EQUIPOS, POKEDEX_SPECIES, POKEDEX_BUILDS, LIGA_CONFIG, LIGA_CALENDARIO, LIGA_JUGADORES] = await Promise.all([
+    [TORNEOS, TIERS, EQUIPOS, POKEDEX_SPECIES, POKEDEX_BUILDS, LIGA_CONFIG, LIGA_CALENDARIO, LIGA_JUGADORES, LIGA_PLAYOFFS] = await Promise.all([
       loadJSON('data/torneos.json'),
       loadJSON('data/tiers.json'),
       loadJSON('data/equipos.json'),
@@ -169,7 +194,8 @@ async function loadAllData(){
       loadJSON('data/pokedex_builds.json'),
       loadJSON('data/liga_config.json'),
       loadJSON('data/liga_calendario.json'),
-      loadJSON('data/liga_jugadores.json')
+      loadJSON('data/liga_jugadores.json'),
+      loadJSONSafe('data/liga_playoffs.json', {})
     ]);
   }catch(e){
     console.error(e);
@@ -287,6 +313,148 @@ function renderLiga(){
       </div>
     `;
   }).join('');
+}
+
+/* ------------------------------------------------------------
+   TABLA GENERAL DE POSICIONES — se calcula sola a partir de los
+   resultados capturados en el calendario. No hay nada que
+   editar aparte: en cuanto el admin guarda un resultado, la
+   tabla y los playoffs se recalculan solos.
+   ------------------------------------------------------------ */
+function computeStandings(){
+  const nombres = new Set();
+  (LIGA_JUGADORES || []).forEach(j => nombres.add(typeof j === 'string' ? j : j.nombre));
+  (LIGA_CALENDARIO || []).forEach(f => (f.partidos || []).forEach(p => {
+    if(p.jugadorA) nombres.add(p.jugadorA);
+    if(p.jugadorB) nombres.add(p.jugadorB);
+  }));
+
+  const stats = {};
+  nombres.forEach(n => { if(n) stats[n] = { nombre:n, pj:0, pg:0, pp:0 }; });
+
+  (LIGA_CALENDARIO || []).forEach(f => (f.partidos || []).forEach(p => {
+    if(!p.resultado) return;
+    const ganador = p.resultado.ganador;
+    const perdedor = ganador === p.jugadorA ? p.jugadorB : p.jugadorA;
+    if(stats[ganador]){ stats[ganador].pj++; stats[ganador].pg++; }
+    if(stats[perdedor]){ stats[perdedor].pj++; stats[perdedor].pp++; }
+  }));
+
+  return Object.values(stats)
+    .map(s => ({ ...s, pct: s.pj ? Math.round((s.pg / s.pj) * 1000) / 10 : 0 }))
+    .sort((a, b) => b.pg - a.pg || b.pct - a.pct || a.pp - b.pp || a.nombre.localeCompare(b.nombre));
+}
+
+function ligaEstaCompleta(){
+  const total = (LIGA_CONFIG && LIGA_CONFIG.totalFechas) || LIGA_CALENDARIO.length;
+  if(!LIGA_CALENDARIO.length || LIGA_CALENDARIO.length < total) return false;
+  return LIGA_CALENDARIO.every(f => f.partidos.every(p => p.resultado));
+}
+
+function renderStandings(){
+  const wrap = document.getElementById('standingsWrap');
+  const standings = computeStandings().filter(s => s.nombre);
+
+  if(!standings.length){
+    wrap.innerHTML = '<p style="color:var(--text-muted); font-family:var(--font-mono); font-size:13px;">Todavía no hay jugadores ni resultados capturados.</p>';
+    return;
+  }
+
+  wrap.innerHTML = `
+    <div class="standings-scroll">
+      <table class="standings-table">
+        <thead>
+          <tr><th>#</th><th>Jugador</th><th>PJ</th><th>PG</th><th>PP</th><th>%</th></tr>
+        </thead>
+        <tbody>
+          ${standings.map((s, i) => `
+            <tr class="${i < 4 ? 'is-qualified' : ''}">
+              <td>${i + 1}</td>
+              <td>${escapeHtml(s.nombre)}${i < 4 ? ' <span class="tag tag--live">Playoffs</span>' : ''}</td>
+              <td>${s.pj}</td>
+              <td>${s.pg}</td>
+              <td>${s.pp}</td>
+              <td>${s.pct}%</td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    </div>
+  `;
+}
+
+/* ------------------------------------------------------------
+   PLAYOFFS — top 4 de la tabla al terminar la fase regular.
+   Semifinal 1: puesto 1 vs puesto 4. Semifinal 2: puesto 2 vs
+   puesto 3. La final y el tercer puesto se arman solos con los
+   ganadores/perdedores de las semis.
+   ------------------------------------------------------------ */
+function matchCard(nombreA, nombreB, resultado, seedA, seedB){
+  const pendA = !nombreA, pendB = !nombreB;
+  const ganaA = resultado && resultado.ganador === nombreA;
+  const ganaB = resultado && resultado.ganador === nombreB;
+  return `
+    <div class="bracket-match">
+      <div class="bracket-slot ${ganaA ? 'is-winner' : ''}">${seedA ? `<span class="seed">#${seedA}</span>` : ''}${pendA ? '<span class="pend">Por definir</span>' : escapeHtml(nombreA)}</div>
+      <div class="bracket-slot ${ganaB ? 'is-winner' : ''}">${seedB ? `<span class="seed">#${seedB}</span>` : ''}${pendB ? '<span class="pend">Por definir</span>' : escapeHtml(nombreB)}</div>
+      ${resultado ? `<div class="bracket-score">${escapeHtml(resultado.marcador || '')}</div>` : ''}
+    </div>
+  `;
+}
+
+function renderPlayoffs(){
+  const cont = document.getElementById('playoffsContainer');
+  const standings = computeStandings();
+  const totalFechas = (LIGA_CONFIG && LIGA_CONFIG.totalFechas) || 15;
+  const fechasCompletas = LIGA_CALENDARIO.filter(f => f.partidos.every(p => p.resultado)).length;
+
+  if(!ligaEstaCompleta() || standings.filter(s => s.pj > 0).length < 4){
+    cont.innerHTML = `
+      <div class="hud-box playoffs-locked">
+        <div class="lock-icon">🔒</div>
+        <h3>Playoffs bloqueados</h3>
+        <p>Se desbloquean al terminar la fase regular — Fecha ${Math.min(fechasCompletas, totalFechas)} de ${totalFechas} completas.</p>
+        <div class="playoffs-progress"><div class="playoffs-progress-bar" style="width:${Math.min(100, (fechasCompletas / totalFechas) * 100)}%"></div></div>
+      </div>
+    `;
+    return;
+  }
+
+  const top4 = standings.slice(0, 4);
+  const s1a = top4[0].nombre, s1b = top4[3].nombre;
+  const s2a = top4[1].nombre, s2b = top4[2].nombre;
+  const r1 = LIGA_PLAYOFFS.semifinal1, r2 = LIGA_PLAYOFFS.semifinal2;
+
+  const finalA = r1 ? r1.ganador : null;
+  const finalB = r2 ? r2.ganador : null;
+  const rf = LIGA_PLAYOFFS.final;
+  const campeon = rf ? rf.ganador : null;
+
+  const tpA = r1 ? (r1.ganador === s1a ? s1b : s1a) : null;
+  const tpB = r2 ? (r2.ganador === s2a ? s2b : s2a) : null;
+  const rt = LIGA_PLAYOFFS.tercerPuesto;
+
+  cont.innerHTML = `
+    <div class="bracket">
+      <div class="bracket-round">
+        <div class="bracket-round-label">Semifinales</div>
+        ${matchCard(s1a, s1b, r1, 1, 4)}
+        ${matchCard(s2a, s2b, r2, 2, 3)}
+      </div>
+      <div class="bracket-round bracket-round--final">
+        <div class="bracket-round-label">Gran final</div>
+        ${matchCard(finalA, finalB, rf)}
+        <div class="bracket-round-label bracket-round-label--3rd">3er puesto</div>
+        ${matchCard(tpA, tpB, rt)}
+      </div>
+      <div class="bracket-round bracket-round--champion">
+        <div class="bracket-round-label">Campeón</div>
+        <div class="champion-card ${campeon ? 'is-decided' : ''}">
+          ${campeon ? `🏆 <span>${escapeHtml(campeon)}</span>` : '<span class="pend">Por definir</span>'}
+        </div>
+      </div>
+    </div>
+  `;
 }
 
 function renderTierList(formato){
@@ -427,6 +595,8 @@ document.querySelectorAll('.switch').forEach(sw => {
   await loadAllData();
   renderTorneos();
   renderLiga();
+  renderStandings();
+  renderPlayoffs();
   renderTierList('singles');
   renderEquipos('singles');
   renderPokedex('');
