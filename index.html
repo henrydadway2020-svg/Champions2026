@@ -16,6 +16,7 @@
     <div class="brand"><span class="dot"></span> Champions Hub</div>
     <nav class="links">
       <a href="#torneos">Torneos</a>
+      <a href="#liga">Liga</a>
       <a href="#tierlist">Tier List</a>
       <a href="#pokedex">Pokédex</a>
       <a href="#equipos">Equipos</a>
@@ -52,11 +53,35 @@
   </div>
 </section>
 
+<section id="liga">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <span class="eyebrow">Temporada</span>
+        <h2 id="ligaTitulo">Liga</h2>
+      </div>
+      <div class="liga-tabs" data-group="liga">
+        <button data-tab="tabla" class="active">Tabla</button>
+        <button data-tab="calendario">Calendario</button>
+        <button data-tab="jugadores">Jugadores</button>
+        <button data-tab="playoffs">Playoffs</button>
+        <button data-tab="historial">Historial</button>
+      </div>
+    </div>
+    <div class="hud-box liga-info" id="ligaInfo"></div>
+    <div id="ligaTabla" class="liga-panel"></div>
+    <div id="ligaCalendario" class="liga-panel" style="display:none;"></div>
+    <div id="ligaJugadores" class="liga-panel" style="display:none;"></div>
+    <div id="ligaPlayoffs" class="liga-panel" style="display:none;"></div>
+    <div id="ligaHistorial" class="liga-panel" style="display:none;"></div>
+  </div>
+</section>
+
 <section id="tierlist">
   <div class="wrap">
     <div class="section-head">
       <div>
-        <span class="eyebrow">Meta actual · Regulación M-B</span>
+        <span class="eyebrow">Meta actual</span>
         <h2>Tier list</h2>
       </div>
       <div class="section-actions">
@@ -130,6 +155,12 @@ let EQUIPOS = {};
 let POKEDEX_SPECIES = [];
 let POKEDEX_BUILDS = {};
 
+let LIGA_CONFIG = {};
+let LIGA_JUGADORES = [];
+let LIGA_CALENDARIO = [];
+let LIGA_PLAYOFFS = { generado:false, semifinal:[], final:null };
+let LIGA_HISTORIAL = [];
+
 let currentTierFmt = 'singles';
 let currentTeamFmt = 'singles';
 
@@ -144,12 +175,17 @@ async function loadJSON(path){
 
 async function loadAllData(){
   try{
-    [TORNEOS, TIERS, EQUIPOS, POKEDEX_SPECIES, POKEDEX_BUILDS] = await Promise.all([
+    [TORNEOS, TIERS, EQUIPOS, POKEDEX_SPECIES, POKEDEX_BUILDS, LIGA_CONFIG, LIGA_JUGADORES, LIGA_CALENDARIO, LIGA_PLAYOFFS, LIGA_HISTORIAL] = await Promise.all([
       loadJSON('data/torneos.json'),
       loadJSON('data/tiers.json'),
       loadJSON('data/equipos.json'),
       loadJSON('data/pokedex_species.json'),
-      loadJSON('data/pokedex_builds.json')
+      loadJSON('data/pokedex_builds.json'),
+      loadJSON('data/liga_config.json'),
+      loadJSON('data/liga_jugadores.json'),
+      loadJSON('data/liga_calendario.json'),
+      loadJSON('data/liga_playoffs.json'),
+      loadJSON('data/liga_historial.json')
     ]);
   }catch(e){
     console.error(e);
@@ -210,10 +246,10 @@ function renderTierList(formato){
         <div class="tier-label">${tier}</div>
         <div class="tier-mons">
           ${data[tier].map(m => `
-            <div class="mon-chip${m.mega ? ' is-mega' : ''}">
+            <div class="mon-chip">
               <img src="${sprite(m.dex)}" alt="${escapeAttr(m.nombre)}" loading="lazy">
               <div class="mon-info">
-                <div class="mon-name">${escapeHtml(m.nombre)}${m.mega ? '<span class="mega-badge">MEGA</span>' : ''}</div>
+                <div class="mon-name">${escapeHtml(m.nombre)}</div>
                 <div class="mon-note">${escapeHtml(m.nota)}</div>
               </div>
             </div>
@@ -318,6 +354,173 @@ function closeModal(){
   document.getElementById('modalContent').innerHTML = '';
 }
 
+/* ============================================================
+   LIGA
+   ============================================================ */
+function computeStandings(){
+  const stats = {};
+  (LIGA_JUGADORES || []).forEach(j => { stats[j.nick] = { nick:j.nick, activo:j.activo, pj:0, pg:0, pp:0, jg:0, jp:0, pts:0 }; });
+  const h2h = {};
+  (LIGA_CALENDARIO || []).forEach(fecha => {
+    (fecha.partidos || []).forEach(p => {
+      if(!p.resultado || !stats[p.jugadorA] || !stats[p.jugadorB]) return;
+      const { juegosA, juegosB } = p.resultado;
+      stats[p.jugadorA].pj++; stats[p.jugadorB].pj++;
+      stats[p.jugadorA].jg += juegosA; stats[p.jugadorA].jp += juegosB;
+      stats[p.jugadorB].jg += juegosB; stats[p.jugadorB].jp += juegosA;
+      const ganador = juegosA > juegosB ? p.jugadorA : p.jugadorB;
+      const perdedor = juegosA > juegosB ? p.jugadorB : p.jugadorA;
+      stats[ganador].pg++; stats[perdedor].pp++;
+      stats[ganador].pts += (LIGA_CONFIG.puntos?.victoria ?? 3);
+      stats[perdedor].pts += (LIGA_CONFIG.puntos?.derrota ?? 0);
+      h2h[ganador] = h2h[ganador] || {};
+      h2h[ganador][perdedor] = (h2h[ganador][perdedor] || 0) + 1;
+    });
+  });
+  const arr = Object.values(stats);
+  arr.sort((a, b) => {
+    if(b.pts !== a.pts) return b.pts - a.pts;
+    const aWins = (h2h[a.nick] && h2h[a.nick][b.nick]) || 0;
+    const bWins = (h2h[b.nick] && h2h[b.nick][a.nick]) || 0;
+    if(aWins !== bWins) return bWins - aWins;
+    const diffA = a.jg - a.jp, diffB = b.jg - b.jp;
+    if(diffB !== diffA) return diffB - diffA;
+    if(b.pg !== a.pg) return b.pg - a.pg;
+    return a.nick.localeCompare(b.nick);
+  });
+  return arr;
+}
+
+function renderLigaInfo(){
+  document.getElementById('ligaTitulo').textContent = LIGA_CONFIG.ligaNombre || 'Liga';
+  const premios = LIGA_CONFIG.premios || {};
+  document.getElementById('ligaInfo').innerHTML = `
+    <div class="liga-info-row">
+      <div><span class="eyebrow">Temporada</span><b>${escapeHtml(LIGA_CONFIG.temporadaNombre)}</b></div>
+      <div><span class="eyebrow">Formato</span><b>${escapeHtml(LIGA_CONFIG.formato)} · ${escapeHtml(LIGA_CONFIG.bo)}</b></div>
+      <div><span class="eyebrow">Estado</span><span class="tag ${LIGA_CONFIG.estado==='en_curso' ? 'tag--live' : ''}">${LIGA_CONFIG.estado==='en_curso' ? '● En curso' : escapeHtml(LIGA_CONFIG.estado)}</span></div>
+      <div><span class="eyebrow">Premios</span><b>${escapeHtml(premios.primero)} / ${escapeHtml(premios.segundo)}</b></div>
+    </div>
+  `;
+}
+
+function renderLigaTabla(){
+  const arr = computeStandings();
+  const el = document.getElementById('ligaTabla');
+  el.innerHTML = `
+    <div class="hud-box liga-table-wrap">
+      <table class="liga-table">
+        <thead><tr><th>#</th><th>Jugador</th><th>PJ</th><th>PG</th><th>PP</th><th>Dif</th><th>Pts</th></tr></thead>
+        <tbody>
+          ${arr.map((s, i) => `
+            <tr class="${i < 4 ? 'qualified' : ''}">
+              <td>${i + 1}</td>
+              <td>${escapeHtml(s.nick)}${!s.activo ? ' <span class="tag" style="color:var(--text-muted)">Inactivo</span>' : ''}</td>
+              <td>${s.pj}</td><td>${s.pg}</td><td>${s.pp}</td>
+              <td>${(s.jg - s.jp) >= 0 ? '+' : ''}${s.jg - s.jp}</td>
+              <td><b>${s.pts}</b></td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    </div>
+    <p class="liga-note">Los primeros 4 lugares (resaltados) clasifican a Playoffs. Desempates: ${(LIGA_CONFIG.desempate || []).map(escapeHtml).join(' → ')}.</p>
+  `;
+}
+
+function renderLigaCalendario(){
+  const el = document.getElementById('ligaCalendario');
+  el.innerHTML = (LIGA_CALENDARIO || []).map(f => `
+    <div class="hud-box fecha-card">
+      <div class="fecha-head">
+        <h3>Fecha ${f.fecha}</h3>
+        <span class="tag ${f.abierta ? 'tag--live' : ''}">${f.abierta ? '● Abierta' : 'Cerrada'}</span>
+      </div>
+      <div class="partidos-list">
+        ${(f.partidos || []).map(p => `
+          <div class="partido-row ${p.resultado ? 'has-result' : ''}">
+            <span class="partido-jugador">${escapeHtml(p.jugadorA)}</span>
+            <span class="partido-vs">${p.resultado ? `${p.resultado.juegosA} - ${p.resultado.juegosB}` : 'vs'}</span>
+            <span class="partido-jugador">${escapeHtml(p.jugadorB)}</span>
+            <span></span>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `).join('') || `<p class="liga-empty">Todavía no hay calendario cargado.</p>`;
+}
+
+function renderLigaJugadores(){
+  const el = document.getElementById('ligaJugadores');
+  el.innerHTML = `<div class="jugadores-grid">${(LIGA_JUGADORES || []).map(j => `
+    <div class="jugador-chip ${j.activo ? '' : 'inactivo'}">
+      <span class="jugador-dot"></span>${escapeHtml(j.nick)}
+    </div>
+  `).join('')}</div>`;
+}
+
+function renderLigaPlayoffs(){
+  const el = document.getElementById('ligaPlayoffs');
+  if(!LIGA_PLAYOFFS || !LIGA_PLAYOFFS.generado){
+    el.innerHTML = `<p class="liga-empty">Los playoffs todavía no se generaron. Se activan al terminar la fase regular.</p>`;
+    return;
+  }
+  const matchHtml = m => `
+    <div class="hud-box playoff-match">
+      <div class="partido-row ${m.resultado ? 'has-result' : ''}">
+        <span class="partido-jugador">${escapeHtml(m.jugadorA)}</span>
+        <span class="partido-vs">${m.resultado ? `${m.resultado.juegosA} - ${m.resultado.juegosB}` : 'vs'}</span>
+        <span class="partido-jugador">${escapeHtml(m.jugadorB)}</span>
+        <span></span>
+      </div>
+    </div>`;
+  el.innerHTML = `
+    <div class="playoff-round">
+      <h3>Semifinales (${LIGA_CONFIG.playoffsFormato?.semifinal || 'BO3'})</h3>
+      <div class="playoff-grid">${(LIGA_PLAYOFFS.semifinal || []).map(matchHtml).join('')}</div>
+    </div>
+    <div class="playoff-round">
+      <h3>Final (${LIGA_CONFIG.playoffsFormato?.final || 'BO5'})</h3>
+      ${LIGA_PLAYOFFS.final ? matchHtml(LIGA_PLAYOFFS.final) : '<p class="liga-empty">Se define cuando terminen las semifinales.</p>'}
+    </div>
+  `;
+}
+
+function renderLigaHistorial(){
+  const el = document.getElementById('ligaHistorial');
+  el.innerHTML = (LIGA_HISTORIAL || []).length ? LIGA_HISTORIAL.map(h => `
+    <div class="hud-box historial-card">
+      <h3>${escapeHtml(h.temporadaNombre || ('Temporada ' + h.temporadaNumero))}</h3>
+      <div class="historial-podio">
+        <div><span class="eyebrow" style="color:var(--gold)">Campeón</span><b>${escapeHtml(h.campeon)}</b></div>
+        <div><span class="eyebrow" style="color:var(--text-muted)">Subcampeón</span><b>${escapeHtml(h.subcampeon)}</b></div>
+      </div>
+      ${h.nota ? `<p class="historial-nota">${escapeHtml(h.nota)}</p>` : ''}
+    </div>
+  `).join('') : `<p class="liga-empty">Todavía no hay temporadas archivadas.</p>`;
+}
+
+function renderLigaAll(){
+  renderLigaInfo();
+  renderLigaTabla();
+  renderLigaCalendario();
+  renderLigaJugadores();
+  renderLigaPlayoffs();
+  renderLigaHistorial();
+}
+
+document.querySelectorAll('.liga-tabs').forEach(tabs => {
+  tabs.addEventListener('click', e => {
+    const btn = e.target.closest('button');
+    if(!btn) return;
+    tabs.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const panels = { tabla:'ligaTabla', calendario:'ligaCalendario', jugadores:'ligaJugadores', playoffs:'ligaPlayoffs', historial:'ligaHistorial' };
+    Object.values(panels).forEach(id => document.getElementById(id).style.display = 'none');
+    document.getElementById(panels[btn.dataset.tab]).style.display = '';
+  });
+});
+
 document.getElementById('pokedexSearch').addEventListener('input', e => renderPokedex(e.target.value));
 
 document.querySelectorAll('.switch').forEach(sw => {
@@ -335,6 +538,7 @@ document.querySelectorAll('.switch').forEach(sw => {
 (async function init(){
   await loadAllData();
   renderTorneos();
+  renderLigaAll();
   renderTierList('singles');
   renderEquipos('singles');
   renderPokedex('');
