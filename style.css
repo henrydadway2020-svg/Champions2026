@@ -308,6 +308,13 @@ section + section{border-top:1px solid var(--border);}
 .mon-chip .mon-name{font-weight:600; font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
 .mon-chip .mon-note{font-size:11.5px; color:var(--text-muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
 .mon-chip .icon-btn{flex-shrink:0;}
+.mon-chip.is-mega{background:rgba(231,177,10,0.06);}
+.mon-chip.is-mega img{box-shadow:0 0 0 2px var(--gold); border-radius:50%;}
+.mega-badge{
+  display:inline-block; font-family:var(--font-mono); font-size:8.5px; font-weight:700;
+  letter-spacing:0.05em; color:#14161C; background:var(--gold); padding:1px 4px;
+  border-radius:3px; vertical-align:middle; margin-left:5px; transform:translateY(-1px);
+}
 
 /* ======================================================
    EQUIPOS
@@ -438,147 +445,4 @@ footer .note{max-width:520px;}
   .mon-chip{min-width:100%;}
   .field-row{grid-template-columns:1fr;}
   .mons-editor-row{grid-template-columns:1fr;}
-}
-
-/* ======================================================
-   LIGA REGULAR — TEMPORADA (nuevo módulo, no toca nada de arriba)
-   ====================================================== */
-.liga-hero{
-  padding:26px; margin-bottom:32px; position:relative; overflow:hidden;
-}
-.liga-hero-top{display:flex; justify-content:space-between; align-items:flex-start; gap:16px; flex-wrap:wrap;}
-.liga-hero h2{font-size:clamp(24px,3.4vw,32px); text-transform:uppercase; margin-top:4px;}
-.liga-hero .liga-sub{font-family:var(--font-mono); font-size:12px; color:var(--text-muted); letter-spacing:0.05em; margin-top:4px;}
-.liga-status-pill{
-  font-family:var(--font-mono); font-size:11px; text-transform:uppercase; letter-spacing:0.06em;
-  padding:5px 12px; border-radius:3px; border:1px solid var(--gold-dim); color:var(--gold);
-  display:inline-flex; align-items:center; gap:6px;
-}
-.liga-status-pill.finalizada{color:var(--green); border-color:var(--green);}
-.liga-status-pill.playoffs{color:var(--magenta); border-color:var(--magenta);}
-.liga-meta-row{display:flex; gap:22px; flex-wrap:wrap; margin-top:18px;}
-.liga-meta-item{font-family:var(--font-mono); font-size:12px; color:var(--text-muted);}
-.liga-meta-item b{display:block; font-family:var(--font-display); font-size:18px; color:var(--text); font-weight:700; letter-spacing:0.02em;}
-.liga-premios{display:flex; gap:14px; margin-top:18px; flex-wrap:wrap;}
-.liga-premio{
-  display:flex; align-items:center; gap:10px; background:var(--surface-2); border:1px solid var(--border);
-  padding:9px 14px; font-size:13px;
-}
-.liga-premio .medal{font-size:18px;}
-
-.liga-tabs{
-  display:inline-flex; border:1px solid var(--border); padding:3px; gap:3px; flex-wrap:wrap;
-  clip-path:polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
-  margin-bottom:28px;
-}
-.liga-tabs button{
-  background:transparent; border:none; color:var(--text-muted); cursor:pointer;
-  font-family:var(--font-mono); font-size:12px; letter-spacing:0.06em; text-transform:uppercase;
-  padding:9px 16px; font-weight:700;
-}
-.liga-tabs button.active{background:var(--gold); color:#14161C;}
-.liga-pane{display:none;}
-.liga-pane.active{display:block;}
-
-/* tabla general */
-.standings-wrap{overflow-x:auto; border:1px solid var(--border);}
-.standings-table{width:100%; border-collapse:collapse; min-width:920px; font-size:13px;}
-.standings-table th{
-  font-family:var(--font-mono); font-size:10.5px; text-transform:uppercase; letter-spacing:0.05em;
-  color:var(--text-muted); text-align:left; padding:12px 10px; background:var(--surface-2);
-  border-bottom:1px solid var(--border); white-space:nowrap;
-}
-.standings-table td{padding:11px 10px; border-bottom:1px solid var(--border); white-space:nowrap;}
-.standings-table tbody tr{cursor:pointer; transition:background .15s;}
-.standings-table tbody tr:hover{background:var(--surface-2);}
-.standings-table tbody tr:nth-child(-n+4){box-shadow:inset 3px 0 0 var(--gold);}
-.standings-table .pos-num{font-family:var(--font-display); font-weight:700; font-size:15px;}
-.standings-table .player-cell{display:flex; align-items:center; gap:8px; font-weight:600;}
-.player-dot{width:7px; height:7px; border-radius:50%; background:var(--green); flex-shrink:0;}
-.player-dot.inactivo{background:var(--red);}
-.standings-table .pts{color:var(--gold); font-weight:700; font-family:var(--font-mono);}
-.diff-pos{color:var(--green);} .diff-neg{color:var(--red);}
-.last5{display:flex; gap:3px;}
-.last5 span{
-  width:18px; height:18px; border-radius:3px; font-family:var(--font-mono); font-size:10px; font-weight:700;
-  display:flex; align-items:center; justify-content:center; color:#0E1015;
-}
-.last5 .W{background:var(--green);} .last5 .L{background:var(--red); color:#fff;} .last5 .P{background:var(--border); color:var(--text-muted);}
-
-/* calendario */
-.liga-calendar-grid{display:grid; grid-template-columns:repeat(auto-fill, minmax(230px,1fr)); gap:14px;}
-.fecha-card{padding:18px; cursor:pointer; transition:border-color .15s, transform .15s;}
-.fecha-card:hover{border-color:var(--gold-dim); transform:translateY(-2px);}
-.fecha-card .fecha-num{font-family:var(--font-display); font-size:26px; font-weight:700;}
-.fecha-card .fecha-name{font-family:var(--font-mono); font-size:11px; color:var(--text-muted); text-transform:uppercase; margin-top:2px;}
-.fecha-card .fecha-progress{margin-top:12px; font-family:var(--font-mono); font-size:11px; color:var(--text-muted);}
-.fecha-badge{
-  display:inline-block; margin-top:10px; font-family:var(--font-mono); font-size:10.5px; text-transform:uppercase;
-  padding:3px 8px; border-radius:3px; border:1px solid var(--border); color:var(--text-muted);
-}
-.fecha-badge.completa{color:var(--green); border-color:var(--green);}
-.fecha-badge.abierta{color:var(--gold); border-color:var(--gold-dim);}
-
-.match-list{display:flex; flex-direction:column; gap:8px;}
-.match-row{
-  display:flex; align-items:center; justify-content:space-between; gap:10px;
-  background:var(--surface-2); border:1px solid var(--border); padding:10px 12px; font-size:13px;
-}
-.match-row .mp-name{flex:1; font-weight:600;}
-.match-row .mp-name.winner{color:var(--gold);}
-.match-row .mp-score{font-family:var(--font-mono); font-weight:700; font-size:13px; color:var(--text-muted); padding:0 10px;}
-.match-row .mp-score.decided{color:var(--gold);}
-.match-row select{background:var(--surface); border:1px solid var(--border); color:var(--text); padding:6px 8px; font-family:var(--font-mono); font-size:12px;}
-
-/* estadísticas */
-.stats-grid{display:grid; grid-template-columns:repeat(auto-fill, minmax(230px,1fr)); gap:14px;}
-.stat-card{padding:18px;}
-.stat-card .stat-label{font-family:var(--font-mono); font-size:11px; text-transform:uppercase; color:var(--text-muted); letter-spacing:0.05em;}
-.stat-card .stat-player{font-family:var(--font-display); font-size:22px; font-weight:700; margin-top:8px;}
-.stat-card .stat-value{font-family:var(--font-mono); font-size:13px; color:var(--gold); margin-top:4px;}
-
-/* playoffs */
-.bracket{display:grid; grid-template-columns:1fr 1fr; gap:24px;}
-.bracket-col h4{font-family:var(--font-mono); font-size:12px; text-transform:uppercase; color:var(--text-muted); letter-spacing:0.06em; margin-bottom:12px;}
-.bracket-match{background:var(--surface-2); border:1px solid var(--border); padding:14px; margin-bottom:12px;}
-.bracket-match .bm-side{display:flex; justify-content:space-between; align-items:center; padding:6px 0; font-size:14px; font-weight:600;}
-.bracket-match .bm-side.winner{color:var(--gold);}
-.bracket-match .bm-side .bm-score{font-family:var(--font-mono); color:var(--text-muted);}
-.bracket-final{grid-column:1 / -1;}
-.bracket-pending{color:var(--text-muted); font-size:13px; font-family:var(--font-mono); padding:16px 0; text-align:center;}
-
-/* ficha de jugador (modal) */
-.player-profile-head{display:flex; align-items:center; justify-content:space-between; gap:14px; margin-bottom:18px;}
-.player-profile-head h3{font-size:22px; text-transform:uppercase;}
-.profile-grid{display:grid; grid-template-columns:1fr 1fr; gap:8px 16px; margin-bottom:16px;}
-.profile-grid dt{font-family:var(--font-mono); font-size:10.5px; text-transform:uppercase; color:var(--text-muted);}
-.profile-grid dd{margin:0 0 8px; font-size:14px; font-weight:600;}
-.profile-next{
-  font-family:var(--font-mono); font-size:12px; color:var(--text-muted); padding:10px 12px;
-  border:1px solid var(--border); margin-bottom:14px;
-}
-.profile-history{max-height:220px; overflow-y:auto; display:flex; flex-direction:column; gap:6px;}
-.profile-history .ph-row{display:flex; justify-content:space-between; font-size:12.5px; padding:7px 10px; background:var(--surface-2); border:1px solid var(--border);}
-
-/* ================= LIGA ADMIN (solo admin.html) ================= */
-.liga-gate{padding:26px; max-width:420px; margin:0 auto;}
-.liga-gate h3{margin-bottom:8px;}
-.liga-gate .hint{margin-bottom:16px;}
-.matchday-card{padding:20px; margin-bottom:16px;}
-.matchday-head{display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:14px; flex-wrap:wrap;}
-.matchday-head h4{font-size:18px; text-transform:uppercase;}
-.reglas-editor{display:flex; flex-direction:column; gap:8px; margin-bottom:10px;}
-.reglas-editor-row{display:flex; gap:8px; align-items:center;}
-.reglas-editor-row input{flex:1;}
-.jugadores-admin-grid{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
-.jugador-admin-row{
-  display:grid; grid-template-columns:1fr 1fr auto auto; gap:8px; align-items:center;
-  background:var(--surface-2); border:1px solid var(--border); padding:8px;
-}
-@media (max-width:640px){
-  .bracket{grid-template-columns:1fr;}
-  .profile-grid{grid-template-columns:1fr;}
-  .jugadores-admin-grid{grid-template-columns:1fr;}
-  .jugador-admin-row{grid-template-columns:1fr 1fr;}
-  .standings-table{min-width:760px;}
 }

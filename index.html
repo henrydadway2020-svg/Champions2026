@@ -15,7 +15,6 @@
   <div class="nav-inner">
     <div class="brand"><span class="dot"></span> Champions Hub</div>
     <nav class="links">
-      <a href="#liga">Liga Regular</a>
       <a href="#torneos">Torneos</a>
       <a href="#tierlist">Tier List</a>
       <a href="#pokedex">Pokédex</a>
@@ -41,56 +40,6 @@
   </div>
 </section>
 
-<section id="liga">
-  <div class="wrap">
-    <div class="hud-box liga-hero">
-      <div class="liga-hero-top">
-        <div>
-          <span class="eyebrow">Liga Regular</span>
-          <h2 id="ligaTitulo">BATTLE CHAMPIONS LEAGUE</h2>
-          <div class="liga-sub" id="ligaSub"></div>
-        </div>
-        <span class="liga-status-pill" id="ligaEstadoPill">—</span>
-      </div>
-      <div class="liga-meta-row" id="ligaMetaRow"></div>
-      <div class="liga-premios" id="ligaPremios"></div>
-    </div>
-
-    <div class="liga-tabs" id="ligaTabs">
-      <button data-pane="tabla" class="active">Tabla General</button>
-      <button data-pane="calendario">Calendario</button>
-      <button data-pane="estadisticas">Estadísticas</button>
-      <button data-pane="playoffs">Playoffs</button>
-    </div>
-
-    <div class="liga-pane active" id="pane-tabla">
-      <div class="standings-wrap">
-        <table class="standings-table">
-          <thead>
-            <tr>
-              <th>#</th><th>Jugador</th><th>PJ</th><th>PG</th><th>PP</th><th>JG</th><th>JP</th><th>+/-</th><th>Pts</th><th>%</th><th>Últimos 5</th>
-            </tr>
-          </thead>
-          <tbody id="standingsBody"></tbody>
-        </table>
-      </div>
-      <p style="color:var(--text-muted); font-family:var(--font-mono); font-size:11px; margin-top:10px;">Los 4 primeros lugares (marcados en dorado) clasifican a semifinales.</p>
-    </div>
-
-    <div class="liga-pane" id="pane-calendario">
-      <div class="liga-calendar-grid" id="ligaCalendarGrid"></div>
-    </div>
-
-    <div class="liga-pane" id="pane-estadisticas">
-      <div class="stats-grid" id="ligaStatsGrid"></div>
-    </div>
-
-    <div class="liga-pane" id="pane-playoffs">
-      <div id="ligaPlayoffsBox"></div>
-    </div>
-  </div>
-</section>
-
 <section id="torneos">
   <div class="wrap">
     <div class="section-head">
@@ -107,7 +56,7 @@
   <div class="wrap">
     <div class="section-head">
       <div>
-        <span class="eyebrow">Meta actual</span>
+        <span class="eyebrow">Meta actual · Regulación M-B</span>
         <h2>Tier list</h2>
       </div>
       <div class="section-actions">
@@ -184,12 +133,6 @@ let POKEDEX_BUILDS = {};
 let currentTierFmt = 'singles';
 let currentTeamFmt = 'singles';
 
-/* Liga Regular - Temporada (módulo nuevo) */
-let LIGA_CONFIG = {};
-let LIGA_JUGADORES = [];
-let LIGA_CALENDARIO = [];
-let LIGA_PLAYOFFS = {};
-
 const SPRITE_BASE = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/";
 const sprite = dex => `${SPRITE_BASE}${dex}.png`;
 
@@ -201,16 +144,12 @@ async function loadJSON(path){
 
 async function loadAllData(){
   try{
-    [TORNEOS, TIERS, EQUIPOS, POKEDEX_SPECIES, POKEDEX_BUILDS, LIGA_CONFIG, LIGA_JUGADORES, LIGA_CALENDARIO, LIGA_PLAYOFFS] = await Promise.all([
+    [TORNEOS, TIERS, EQUIPOS, POKEDEX_SPECIES, POKEDEX_BUILDS] = await Promise.all([
       loadJSON('data/torneos.json'),
       loadJSON('data/tiers.json'),
       loadJSON('data/equipos.json'),
       loadJSON('data/pokedex_species.json'),
-      loadJSON('data/pokedex_builds.json'),
-      loadJSON('data/liga_config.json'),
-      loadJSON('data/liga_jugadores.json'),
-      loadJSON('data/liga_calendario.json'),
-      loadJSON('data/liga_playoffs.json')
+      loadJSON('data/pokedex_builds.json')
     ]);
   }catch(e){
     console.error(e);
@@ -271,10 +210,10 @@ function renderTierList(formato){
         <div class="tier-label">${tier}</div>
         <div class="tier-mons">
           ${data[tier].map(m => `
-            <div class="mon-chip">
+            <div class="mon-chip${m.mega ? ' is-mega' : ''}">
               <img src="${sprite(m.dex)}" alt="${escapeAttr(m.nombre)}" loading="lazy">
               <div class="mon-info">
-                <div class="mon-name">${escapeHtml(m.nombre)}</div>
+                <div class="mon-name">${escapeHtml(m.nombre)}${m.mega ? '<span class="mega-badge">MEGA</span>' : ''}</div>
                 <div class="mon-note">${escapeHtml(m.nota)}</div>
               </div>
             </div>
@@ -393,288 +332,12 @@ document.querySelectorAll('.switch').forEach(sw => {
   });
 });
 
-/* ============================================================
-   LIGA REGULAR — TEMPORADA (módulo nuevo, no toca nada de arriba)
-   Todo se calcula en el navegador a partir de data/liga_*.json:
-   PJ/PG/PP/JG/JP/Diferencia/Puntos/% y desempates se recalculan
-   solos cada vez que cambian los datos, sin recargar la página.
-   ============================================================ */
-
-function ligaPuntosVictoria(){
-  return (LIGA_CONFIG.puntos && LIGA_CONFIG.puntos.victoria) || 3;
-}
-
-function computeLigaStandings(){
-  const stats = {};
-  (LIGA_JUGADORES || []).forEach(j => {
-    stats[j.nick] = { nick:j.nick, activo:j.activo !== false, pj:0, pg:0, pp:0, jg:0, jp:0, last5:[], h2h:{} };
-  });
-  (LIGA_CALENDARIO || []).forEach(f => {
-    (f.partidos || []).forEach(p => {
-      const A = stats[p.jugadorA], B = stats[p.jugadorB];
-      if(!A || !B) return;
-      let ga, gb;
-      if(p.resultado){
-        ga = p.resultado.ga; gb = p.resultado.gb;
-      } else if(!A.activo || !B.activo){
-        // jugador que abandonó la liga: los encuentros pendientes cuentan como derrota
-        if(!A.activo && !B.activo) return;
-        ga = A.activo ? 2 : 0;
-        gb = A.activo ? 0 : 2;
-      } else {
-        return; // todavía sin jugar
-      }
-      A.pj++; B.pj++;
-      A.jg += ga; A.jp += gb;
-      B.jg += gb; B.jp += ga;
-      const aGana = ga > gb;
-      if(aGana){ A.pg++; B.pp++; A.last5.push('W'); B.last5.push('L'); }
-      else{ B.pg++; A.pp++; B.last5.push('W'); A.last5.push('L'); }
-      A.h2h[p.jugadorB] = aGana ? 'W' : 'L';
-      B.h2h[p.jugadorA] = aGana ? 'L' : 'W';
-    });
-  });
-  const arr = Object.values(stats).map(s => ({
-    ...s,
-    diff: s.jg - s.jp,
-    pts: s.pg * ligaPuntosVictoria(),
-    pct: s.pj ? Math.round((s.pg / s.pj) * 1000) / 10 : 0,
-    last5: s.last5.slice(-5)
-  }));
-  arr.sort((x, y) => {
-    if(y.pts !== x.pts) return y.pts - x.pts;
-    if(x.h2h[y.nick] === 'W') return -1;
-    if(x.h2h[y.nick] === 'L') return 1;
-    if(y.diff !== x.diff) return y.diff - x.diff;
-    if(y.pg !== x.pg) return y.pg - x.pg;
-    return x.nick.localeCompare(y.nick); // último criterio: sorteo (orden estable)
-  });
-  return arr;
-}
-
-function renderLast5(arr){
-  const padded = [...arr];
-  while(padded.length < 5) padded.unshift('P');
-  return padded.map(r => `<span class="${r}">${r === 'P' ? '–' : r}</span>`).join('');
-}
-
-function renderLigaHeader(){
-  const estados = { en_curso:'En curso', playoffs:'Playoffs', finalizada:'Finalizada' };
-  document.getElementById('ligaTitulo').textContent = LIGA_CONFIG.ligaNombre || 'BATTLE CHAMPIONS LEAGUE';
-  document.getElementById('ligaSub').textContent =
-    `${LIGA_CONFIG.temporadaNombre || ''} · Pokémon Champions ${LIGA_CONFIG.formato === 'doubles' ? 'Doubles' : 'Singles'} · ${LIGA_CONFIG.bo || 'BO3'} · Round Robin`;
-  const pill = document.getElementById('ligaEstadoPill');
-  pill.textContent = estados[LIGA_CONFIG.estado] || 'En curso';
-  pill.className = 'liga-status-pill ' + (LIGA_CONFIG.estado || '');
-  document.getElementById('ligaMetaRow').innerHTML = `
-    <div class="liga-meta-item"><b>${LIGA_CONFIG.totalJugadores || 16}</b>Jugadores</div>
-    <div class="liga-meta-item"><b>${LIGA_CONFIG.totalFechas || 15}</b>Fechas</div>
-    <div class="liga-meta-item"><b>Round Robin</b>Todos contra todos</div>
-  `;
-  document.getElementById('ligaPremios').innerHTML = `
-    <div class="liga-premio"><span class="medal">🥇</span> 1° Lugar — ${escapeHtml(LIGA_CONFIG.premios ? LIGA_CONFIG.premios.primero : '')}</div>
-    <div class="liga-premio"><span class="medal">🥈</span> 2° Lugar — ${escapeHtml(LIGA_CONFIG.premios ? LIGA_CONFIG.premios.segundo : '')}</div>
-  `;
-}
-
-function renderStandings(){
-  const arr = computeLigaStandings();
-  document.getElementById('standingsBody').innerHTML = arr.map((s, i) => `
-    <tr onclick="openPlayerProfile(${JSON.stringify(s.nick)})">
-      <td class="pos-num">${i + 1}</td>
-      <td><div class="player-cell"><span class="player-dot ${s.activo ? '' : 'inactivo'}" title="${s.activo ? 'Activo' : 'Retirado'}"></span>${escapeHtml(s.nick)}</div></td>
-      <td>${s.pj}</td><td>${s.pg}</td><td>${s.pp}</td><td>${s.jg}</td><td>${s.jp}</td>
-      <td class="${s.diff > 0 ? 'diff-pos' : s.diff < 0 ? 'diff-neg' : ''}">${s.diff > 0 ? '+' : ''}${s.diff}</td>
-      <td class="pts">${s.pts}</td>
-      <td>${s.pct}%</td>
-      <td><div class="last5">${renderLast5(s.last5)}</div></td>
-    </tr>
-  `).join('') || `<tr><td colspan="11" style="color:var(--text-muted); font-family:var(--font-mono); font-size:12px;">Todavía no hay jugadores cargados.</td></tr>`;
-}
-
-function renderLigaCalendar(){
-  const grid = document.getElementById('ligaCalendarGrid');
-  grid.innerHTML = (LIGA_CALENDARIO || []).map(f => {
-    const jugados = f.partidos.filter(p => p.resultado).length;
-    const completa = jugados === f.partidos.length;
-    return `
-      <div class="hud-box fecha-card" onclick="openFechaModal(${f.fecha})">
-        <div class="fecha-num">Fecha ${f.fecha}</div>
-        <div class="fecha-name">${jugados}/${f.partidos.length} partidos jugados</div>
-        <span class="fecha-badge ${completa ? 'completa' : (f.abierta ? 'abierta' : '')}">${completa ? '✔ Completa' : (f.abierta ? '● Abierta' : 'Cerrada')}</span>
-      </div>
-    `;
-  }).join('');
-}
-
-function openFechaModal(fechaNum){
-  const f = (LIGA_CALENDARIO || []).find(x => x.fecha === fechaNum);
-  if(!f) return;
-  openModal(`
-    <h3>Fecha ${f.fecha}</h3>
-    <div class="match-list">
-      ${f.partidos.map(p => {
-        const r = p.resultado;
-        const aGana = r && r.ga > r.gb, bGana = r && r.gb > r.ga;
-        return `
-        <div class="match-row">
-          <span class="mp-name ${aGana ? 'winner' : ''}">${escapeHtml(p.jugadorA)}</span>
-          <span class="mp-score ${r ? 'decided' : ''}">${r ? `${r.ga} - ${r.gb}` : 'vs'}</span>
-          <span class="mp-name ${bGana ? 'winner' : ''}">${escapeHtml(p.jugadorB)}</span>
-        </div>`;
-      }).join('')}
-    </div>
-    <div class="modal-actions"><button class="btn btn--ghost btn--sm" onclick="closeModal()">Cerrar</button></div>
-  `);
-}
-
-function renderLigaStats(){
-  const arr = computeLigaStandings();
-  const grid = document.getElementById('ligaStatsGrid');
-  if(arr.length === 0){ grid.innerHTML = ''; return; }
-  const top = (key) => [...arr].sort((a, b) => b[key] - a[key])[0];
-  const jugados = arr.filter(s => s.pj > 0);
-  const menosJP = jugados.length ? [...jugados].sort((a, b) => a.jp - b.jp)[0] : null;
-  const rachas = arr.map(s => {
-    let racha = 0, tipo = null;
-    for(let i = s.last5.length - 1; i >= 0; i--){
-      const r = s.last5[i];
-      if(tipo === null){ tipo = r; racha = 1; }
-      else if(r === tipo) racha++;
-      else break;
-    }
-    return { nick:s.nick, racha, tipo };
-  });
-  const mejorRacha = [...rachas].filter(s => s.tipo === 'W').sort((a, b) => b.racha - a.racha)[0];
-
-  const cards = [
-    ['Líder del torneo', arr[0], arr[0] ? `${arr[0].pts} pts` : '—'],
-    ['Más victorias', top('pg'), `${top('pg').pg} PG`],
-    ['Mejor diferencia', top('diff'), `${top('diff').diff >= 0 ? '+' : ''}${top('diff').diff}`],
-    ['Más juegos ganados', top('jg'), `${top('jg').jg} JG`],
-    ['Menos juegos perdidos', menosJP, menosJP ? `${menosJP.jp} JP` : '—'],
-    ['Mejor porcentaje', top('pct'), `${top('pct').pct}%`],
-    ['Ranking ofensivo', top('jg'), `${top('jg').jg} juegos ganados`],
-    ['Ranking defensivo', menosJP, menosJP ? `${menosJP.jp} juegos perdidos` : '—']
-  ];
-  grid.innerHTML = cards.map(([label, s, val]) => `
-    <div class="hud-box stat-card">
-      <div class="stat-label">${label}</div>
-      <div class="stat-player">${s ? escapeHtml(s.nick) : '—'}</div>
-      <div class="stat-value">${val}</div>
-    </div>
-  `).join('') + (mejorRacha ? `
-    <div class="hud-box stat-card">
-      <div class="stat-label">Mayor racha</div>
-      <div class="stat-player">${escapeHtml(mejorRacha.nick)}</div>
-      <div class="stat-value">${mejorRacha.racha} victorias seguidas</div>
-    </div>` : '');
-}
-
-function bracketMatchHtml(m){
-  const r = m.resultado;
-  const aGana = r && r.ga > r.gb, bGana = r && r.gb > r.ga;
-  return `
-    <div class="bracket-match">
-      <div class="bm-side ${aGana ? 'winner' : ''}"><span>${escapeHtml(m.jugadorA)}</span><span class="bm-score">${r ? r.ga : '–'}</span></div>
-      <div class="bm-side ${bGana ? 'winner' : ''}"><span>${escapeHtml(m.jugadorB)}</span><span class="bm-score">${r ? r.gb : '–'}</span></div>
-    </div>`;
-}
-
-function renderLigaPlayoffs(){
-  const box = document.getElementById('ligaPlayoffsBox');
-  if(!LIGA_PLAYOFFS.generado){
-    box.innerHTML = `<div class="hud-box bracket-pending" style="padding:30px;">Los playoffs (Top 4) se generan automáticamente cuando el administrador cierra la Fecha 15. Todavía no están disponibles.</div>`;
-    return;
-  }
-  const sf = LIGA_PLAYOFFS.semifinal || [];
-  const final = LIGA_PLAYOFFS.final;
-  box.innerHTML = `
-    <div class="bracket">
-      <div class="bracket-col"><h4>Semifinales (BO3)</h4>${sf.map(bracketMatchHtml).join('') || '<p class="bracket-pending">—</p>'}</div>
-      <div class="bracket-col"><h4>Final (BO5)</h4>${final ? bracketMatchHtml(final) : '<p class="bracket-pending">Se define al terminar las semifinales.</p>'}</div>
-    </div>
-  `;
-}
-
-function openPlayerProfile(nick){
-  const arr = computeLigaStandings();
-  const idx = arr.findIndex(s => s.nick === nick);
-  const s = arr[idx];
-  if(!s) return;
-  let proximo = null;
-  for(const f of (LIGA_CALENDARIO || [])){
-    for(const p of f.partidos){
-      if(!p.resultado && (p.jugadorA === nick || p.jugadorB === nick)){
-        proximo = { fecha:f.fecha, rival: p.jugadorA === nick ? p.jugadorB : p.jugadorA };
-        break;
-      }
-    }
-    if(proximo) break;
-  }
-  const historial = [];
-  (LIGA_CALENDARIO || []).forEach(f => {
-    f.partidos.forEach(p => {
-      if(p.resultado && (p.jugadorA === nick || p.jugadorB === nick)){
-        const rival = p.jugadorA === nick ? p.jugadorB : p.jugadorA;
-        const propio = p.jugadorA === nick ? p.resultado.ga : p.resultado.gb;
-        const rivalScore = p.jugadorA === nick ? p.resultado.gb : p.resultado.ga;
-        historial.push({ fecha:f.fecha, rival, propio, rivalScore, gano: propio > rivalScore });
-      }
-    });
-  });
-  openModal(`
-    <div class="player-profile-head">
-      <div><h3>${escapeHtml(nick)}</h3><span class="tag">Posición #${idx + 1}</span></div>
-      <span class="player-dot ${s.activo ? '' : 'inactivo'}" title="${s.activo ? 'Activo' : 'Retirado'}"></span>
-    </div>
-    <dl class="profile-grid">
-      <dt>Puntos</dt><dd>${s.pts}</dd>
-      <dt>PJ</dt><dd>${s.pj}</dd>
-      <dt>PG</dt><dd>${s.pg}</dd>
-      <dt>PP</dt><dd>${s.pp}</dd>
-      <dt>JG</dt><dd>${s.jg}</dd>
-      <dt>JP</dt><dd>${s.jp}</dd>
-      <dt>Diferencia</dt><dd>${s.diff >= 0 ? '+' : ''}${s.diff}</dd>
-      <dt>Porcentaje</dt><dd>${s.pct}%</dd>
-    </dl>
-    <div class="profile-next">${proximo ? `Próximo rival: <b>${escapeHtml(proximo.rival)}</b> (Fecha ${proximo.fecha})` : 'Sin partidos pendientes.'}</div>
-    <div class="profile-history">
-      ${historial.length ? historial.map(h => `
-        <div class="ph-row">
-          <span>Fecha ${h.fecha} vs ${escapeHtml(h.rival)}</span>
-          <span style="color:${h.gano ? 'var(--green)' : 'var(--red)'}">${h.propio}-${h.rivalScore}</span>
-        </div>
-      `).join('') : '<p style="color:var(--text-muted); font-size:12px;">Todavía no hay partidos jugados.</p>'}
-    </div>
-    <div class="modal-actions"><button class="btn btn--ghost btn--sm" onclick="closeModal()">Cerrar</button></div>
-  `);
-}
-
-function renderLiga(){
-  renderLigaHeader();
-  renderStandings();
-  renderLigaCalendar();
-  renderLigaStats();
-  renderLigaPlayoffs();
-}
-
-document.getElementById('ligaTabs').addEventListener('click', e => {
-  const btn = e.target.closest('button');
-  if(!btn) return;
-  document.querySelectorAll('#ligaTabs button').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  document.querySelectorAll('.liga-pane').forEach(p => p.classList.remove('active'));
-  document.getElementById('pane-' + btn.dataset.pane).classList.add('active');
-});
-
 (async function init(){
   await loadAllData();
   renderTorneos();
   renderTierList('singles');
   renderEquipos('singles');
   renderPokedex('');
-  renderLiga();
 })();
 </script>
 
