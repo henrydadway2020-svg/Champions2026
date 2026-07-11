@@ -179,8 +179,9 @@ function renderTicker(){
 
 function renderTorneos(){
   const grid = document.getElementById("tourneyGrid");
-  grid.innerHTML = TORNEOS.map(t => `
-    <div class="hud-box tourney-card">
+  const ordenados = [...TORNEOS].sort((a, b) => (b.status === 'live') - (a.status === 'live'));
+  grid.innerHTML = ordenados.map(t => `
+    <div class="hud-box tourney-card${t.status==='live' ? ' is-live' : ''}" data-formato="${escapeAttr(t.formato)}">
       <div class="tourney-top">
         <h3>${escapeHtml(t.nombre)}</h3>
         <span class="tag ${t.status==='live' ? 'tag--live' : ''}">${t.status==='live' ? '● En curso' : 'Próximo'}</span>
