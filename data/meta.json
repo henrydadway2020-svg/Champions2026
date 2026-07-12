@@ -1,0 +1,74 @@
+{
+  "singles": {
+    "equipos": [
+      {
+        "nombre": "Hazard Stack",
+        "arquetipo": "Stall / hazards",
+        "usos": 18,
+        "mons": [
+          { "nombre": "Hippowdon", "dex": 450 },
+          { "nombre": "Garchomp", "dex": 445 },
+          { "nombre": "Gholdengo", "dex": 1000 }
+        ]
+      },
+      {
+        "nombre": "Speed Sweep",
+        "arquetipo": "Ofensivo rápido",
+        "usos": 11,
+        "mons": [
+          { "nombre": "Dragapult", "dex": 887 },
+          { "nombre": "Urshifu", "dex": 892 },
+          { "nombre": "Mimikyu", "dex": 778 }
+        ]
+      }
+    ],
+    "estrategias": [
+      { "nombre": "Hazard Stack + desgaste", "descripcion": "Poner Stealth Rock temprano y desgastar con Sand mientras un muro recupera HP.", "usos": 18 },
+      { "nombre": "Ofensivo rápido con Choice", "descripcion": "Presionar desde el inicio con items Choice y rematar con un revenge killer.", "usos": 11 },
+      { "nombre": "Balance con revenge killer", "descripcion": "Combinar un muro defensivo con un cierre rápido tipo Scarf.", "usos": 7 }
+    ],
+    "builds": [
+      { "nombre": "Garchomp", "dex": 445, "item": "Choice Scarf", "movs": ["Outrage", "Earthquake", "Scale Shot", "Stone Edge"], "usos": 31, "nota": "Revenge kill / cierre" },
+      { "nombre": "Gholdengo", "dex": 1000, "item": "Air Balloon", "movs": ["Shadow Ball", "Make It Rain", "Recover", "Thunderbolt"], "usos": 27, "nota": "Muro especial, Recover" },
+      { "nombre": "Hippowdon", "dex": 450, "item": "Leftovers", "movs": ["Stealth Rock", "Slack Off", "Earthquake", "Whirlwind"], "usos": 24, "nota": "Stealth Rock + Slack Off" },
+      { "nombre": "Dragapult", "dex": 887, "item": "Choice Specs", "movs": ["Draco Meteor", "Shadow Ball", "Flamethrower", "U-turn"], "usos": 19, "nota": "Coverage especial, mueve primero" }
+    ]
+  },
+  "doubles": {
+    "equipos": [
+      {
+        "nombre": "Sun Offense",
+        "arquetipo": "Clima / ofensivo",
+        "usos": 15,
+        "mons": [
+          { "nombre": "Torkoal", "dex": 324 },
+          { "nombre": "Incineroar", "dex": 727 },
+          { "nombre": "Iron Hands", "dex": 992 },
+          { "nombre": "Flutter Mane", "dex": 987 }
+        ]
+      },
+      {
+        "nombre": "Grassy Terrain",
+        "arquetipo": "Terreno / control",
+        "usos": 12,
+        "mons": [
+          { "nombre": "Rillaboom", "dex": 812 },
+          { "nombre": "Amoonguss", "dex": 591 },
+          { "nombre": "Kingambit", "dex": 983 },
+          { "nombre": "Pelipper", "dex": 279 }
+        ]
+      }
+    ],
+    "estrategias": [
+      { "nombre": "Sol + Fake Out/Intimidate", "descripcion": "Torkoal activa sol para potenciar fuego mientras Incineroar controla el ritmo del turno 1.", "usos": 15 },
+      { "nombre": "Terreno de hierba + redirección", "descripcion": "Rillaboom cura y potencia con Grassy Terrain; Amoonguss redirige ataques con Rage Powder.", "usos": 12 },
+      { "nombre": "Prioridad doble (Fake Out + Sucker Punch)", "descripcion": "Combinar Fake Out con Sucker Punch para presionar antes de que el rival actúe.", "usos": 9 }
+    ],
+    "builds": [
+      { "nombre": "Incineroar", "dex": 727, "item": "Sitrus Berry", "movs": ["Fake Out", "Flare Blitz", "Knock Off", "Parting Shot"], "usos": 26, "nota": "Fake Out + Intimidate" },
+      { "nombre": "Rillaboom", "dex": 812, "item": "Assault Vest", "movs": ["Grassy Glide", "Wood Hammer", "U-turn", "Fake Out"], "usos": 23, "nota": "Grassy Terrain + Grassy Glide" },
+      { "nombre": "Kingambit", "dex": 983, "item": "Black Glasses", "movs": ["Sucker Punch", "Kowtow Cleave", "Iron Head", "Protect"], "usos": 20, "nota": "Sucker Punch prioridad" },
+      { "nombre": "Flutter Mane", "dex": 987, "item": "Focus Sash", "movs": ["Moonblast", "Shadow Ball", "Icy Wind", "Protect"], "usos": 17, "nota": "Sweeper especial rápido" }
+    ]
+  }
+}
