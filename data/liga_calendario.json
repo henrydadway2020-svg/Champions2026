@@ -85,7 +85,10 @@
         "id": 9,
         "jugadorA": "Omega",
         "jugadorB": "Bryvil",
-        "resultado": null
+        "resultado": {
+          "ganador": "Bryvil",
+          "marcador": "2-1"
+        }
       },
       {
         "id": 10,
@@ -130,7 +133,10 @@
         "id": 16,
         "jugadorA": "Gush",
         "jugadorB": "Elbolas",
-        "resultado": null
+        "resultado": {
+          "ganador": "Gush",
+          "marcador": "2-1"
+        }
       }
     ]
   },
