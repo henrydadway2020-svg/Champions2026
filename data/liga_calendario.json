@@ -52,19 +52,28 @@
         "id": 6,
         "jugadorA": "Vik",
         "jugadorB": "Sukuna",
-        "resultado": null
+        "resultado": {
+          "ganador": "Vik",
+          "marcador": "2-1"
+        }
       },
       {
         "id": 7,
         "jugadorA": "Gush",
         "jugadorB": "RoninMx",
-        "resultado": null
+        "resultado": {
+          "ganador": "RoninMx",
+          "marcador": "2-0"
+        }
       },
       {
         "id": 8,
         "jugadorA": "Elbolas",
         "jugadorB": "RedWarrior",
-        "resultado": null
+        "resultado": {
+          "ganador": "Elbolas",
+          "marcador": "2-1"
+        }
       }
     ]
   },
