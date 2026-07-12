@@ -23,6 +23,7 @@
       <a href="#liga">Liga</a>
       <a href="#playoffs">Playoffs</a>
       <a href="#tierlist">Tier List</a>
+      <a href="#meta">Meta</a>
       <a href="#equipos">Equipos</a>
       <a href="#pokedex">Pokédex</a>
       <a href="#especies">Roster</a>
@@ -96,6 +97,35 @@
       <div id="tierListContainer"></div>
     </section>
 
+    <section id="meta">
+      <div class="section-head">
+        <div><span class="eyebrow">Datos de competencia</span><h2>Meta del torneo</h2></div>
+        <div class="switch" data-group="meta">
+          <button data-fmt="singles" class="active">Singles</button>
+          <button data-fmt="doubles">Doubles</button>
+        </div>
+      </div>
+      <p class="hint" style="color:var(--text-muted); font-size:13px; margin-bottom:14px;">Carga aquí manualmente cuántos torneos usaron cada equipo, estrategia o build (un número, no un cálculo automático). Esto alimenta la sección pública "Meta del torneo".</p>
+
+      <div class="meta-subhead">
+        <h3>Equipos más usados</h3>
+        <button class="btn btn--primary btn--sm" onclick="openMetaEquipoForm(currentMetaFmt)">+ Nuevo equipo</button>
+      </div>
+      <div class="meta-equipos-grid" id="metaEquiposGrid"></div>
+
+      <div class="meta-subhead">
+        <h3>Estrategias más usadas</h3>
+        <button class="btn btn--primary btn--sm" onclick="openMetaEstrategiaForm(currentMetaFmt)">+ Nueva estrategia</button>
+      </div>
+      <div id="metaEstrategiasList"></div>
+
+      <div class="meta-subhead">
+        <h3>Builds más usadas</h3>
+        <button class="btn btn--primary btn--sm" onclick="openMetaBuildForm(currentMetaFmt)">+ Nueva build</button>
+      </div>
+      <div class="meta-builds-grid" id="metaBuildsGrid"></div>
+    </section>
+
     <section id="equipos">
       <div class="section-head">
         <div><span class="eyebrow">Team building</span><h2>Equipos armados</h2></div>
@@ -154,6 +184,7 @@ const FILES = {
   torneos: 'data/torneos.json',
   tiers: 'data/tiers.json',
   equipos: 'data/equipos.json',
+  meta: 'data/meta.json',
   pokedex_builds: 'data/pokedex_builds.json',
   pokedex_species: 'data/pokedex_species.json',
   liga_config: 'data/liga_config.json',
@@ -165,6 +196,7 @@ const DEFAULTS = {
   torneos: [],
   tiers: { singles:{}, doubles:{} },
   equipos: { singles:[], doubles:[] },
+  meta: { singles:{equipos:[],estrategias:[],builds:[]}, doubles:{equipos:[],estrategias:[],builds:[]} },
   pokedex_builds: {},
   pokedex_species: [],
   liga_config: {},
@@ -174,15 +206,21 @@ const DEFAULTS = {
 };
 let SHAS = {};
 
-let TORNEOS = [], TIERS = {}, EQUIPOS = {}, POKEDEX_SPECIES = [], POKEDEX_BUILDS = {};
+let TORNEOS = [], TIERS = {}, EQUIPOS = {}, META = {}, POKEDEX_SPECIES = [], POKEDEX_BUILDS = {};
 let LIGA_CONFIG = {}, LIGA_CALENDARIO = [], LIGA_JUGADORES = [], LIGA_PLAYOFFS = {};
 let ligaFechaSeleccionada = 1;
 let currentTierFmt = 'singles';
 let currentTeamFmt = 'singles';
+let currentMetaFmt = 'singles';
 let editingTorneoIndex = null;
 let editingTeamIndex = null;
 let editingTeamFormato = 'singles';
 let formMons = [];
+let editingMetaFormato = 'singles';
+let editingMetaEquipoIndex = null;
+let editingMetaEstrategiaIndex = null;
+let editingMetaBuildIndex = null;
+let metaFormMons = [];
 
 const SPRITE_BASE = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/";
 const sprite = dex => `${SPRITE_BASE}${dex}.png`;
@@ -270,8 +308,8 @@ async function connectAndLoad(){
   localStorage.setItem(CONFIG_KEY, JSON.stringify(CONFIG));
   setStatus('Conectando...', null);
   try{
-    [TORNEOS, TIERS, EQUIPOS, POKEDEX_SPECIES, POKEDEX_BUILDS, LIGA_CONFIG, LIGA_CALENDARIO, LIGA_JUGADORES, LIGA_PLAYOFFS] = await Promise.all([
-      loadFile('torneos'), loadFile('tiers'), loadFile('equipos'), loadFile('pokedex_species'), loadFile('pokedex_builds'),
+    [TORNEOS, TIERS, EQUIPOS, META, POKEDEX_SPECIES, POKEDEX_BUILDS, LIGA_CONFIG, LIGA_CALENDARIO, LIGA_JUGADORES, LIGA_PLAYOFFS] = await Promise.all([
+      loadFile('torneos'), loadFile('tiers'), loadFile('equipos'), loadFile('meta'), loadFile('pokedex_species'), loadFile('pokedex_builds'),
       loadFile('liga_config'), loadFile('liga_calendario'), loadFile('liga_jugadores'), loadFile('liga_playoffs')
     ]);
     document.getElementById('adminContent').style.display = 'block';
@@ -279,6 +317,7 @@ async function connectAndLoad(){
     renderTorneos();
     renderTierList('singles');
     renderEquipos('singles');
+    renderMetaAdmin('singles');
     renderPokedex('');
     renderSpeciesAdmin();
     renderLigaAdmin();
@@ -754,6 +793,289 @@ async function deleteTeam(formato, index){
 }
 
 /* ============================================================
+   META DEL TORNEO — equipos, estrategias y builds más usados.
+   El "usos" es un número que carga el administrador a mano
+   (cuántos torneos vio ese equipo/estrategia/build); no se
+   calcula solo con nada de Liga ni Torneos.
+   ============================================================ */
+function renderMetaAdmin(formato){
+  currentMetaFmt = formato;
+  if(!META[formato]) META[formato] = { equipos:[], estrategias:[], builds:[] };
+  const data = META[formato];
+  renderMetaEquiposAdmin(formato, data.equipos || []);
+  renderMetaEstrategiasAdmin(formato, data.estrategias || []);
+  renderMetaBuildsAdmin(formato, data.builds || []);
+}
+
+function renderMetaEquiposAdmin(formato, list){
+  const grid = document.getElementById('metaEquiposGrid');
+  if(!list.length){
+    grid.innerHTML = `<p style="color:var(--text-muted); font-family:var(--font-mono); font-size:13px;">Todavía no hay equipos registrados.</p>`;
+    return;
+  }
+  const max = Math.max(1, ...list.map(e => e.usos||0));
+  grid.innerHTML = list.map((eq, i) => `
+    <div class="hud-box meta-team-card">
+      <div class="meta-team-head">
+        <h4>${escapeHtml(eq.nombre)}</h4>
+        <div class="team-editbar">
+          <button class="icon-btn" title="Editar" onclick="openMetaEquipoForm('${formato}', ${i})">✎</button>
+          <button class="icon-btn danger" title="Eliminar" onclick="deleteMetaEquipo('${formato}', ${i})">✕</button>
+        </div>
+      </div>
+      <div class="meta-team-archetype">${escapeHtml(eq.arquetipo || '')}</div>
+      <div class="usage-bar"><div class="usage-bar-fill" style="width:${Math.round(((eq.usos||0)/max)*100)}%"></div></div>
+      <span class="usage-count">${eq.usos || 0} torneos</span>
+      <div class="meta-team-mons">
+        ${(eq.mons||[]).map(m => `<img src="${sprite(m.dex)}" alt="${escapeAttr(m.nombre)}" title="${escapeAttr(m.nombre)}" loading="lazy">`).join('')}
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderMetaEstrategiasAdmin(formato, list){
+  const cont = document.getElementById('metaEstrategiasList');
+  if(!list.length){
+    cont.innerHTML = `<p style="color:var(--text-muted); font-family:var(--font-mono); font-size:13px;">Todavía no hay estrategias registradas.</p>`;
+    return;
+  }
+  const max = Math.max(1, ...list.map(e => e.usos||0));
+  cont.innerHTML = list.map((e, i) => `
+    <div class="meta-strategy-row">
+      <div class="meta-strategy-body">
+        <div class="meta-strategy-name">${escapeHtml(e.nombre)}</div>
+        ${e.descripcion ? `<div class="meta-strategy-desc">${escapeHtml(e.descripcion)}</div>` : ''}
+        <div class="usage-bar"><div class="usage-bar-fill" style="width:${Math.round(((e.usos||0)/max)*100)}%"></div></div>
+        <span class="usage-count">${e.usos || 0} torneos</span>
+      </div>
+      <div class="team-editbar">
+        <button class="icon-btn" title="Editar" onclick="openMetaEstrategiaForm('${formato}', ${i})">✎</button>
+        <button class="icon-btn danger" title="Eliminar" onclick="deleteMetaEstrategia('${formato}', ${i})">✕</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderMetaBuildsAdmin(formato, list){
+  const grid = document.getElementById('metaBuildsGrid');
+  if(!list.length){
+    grid.innerHTML = `<p style="color:var(--text-muted); font-family:var(--font-mono); font-size:13px;">Todavía no hay builds registradas.</p>`;
+    return;
+  }
+  const max = Math.max(1, ...list.map(e => e.usos||0));
+  grid.innerHTML = list.map((b, i) => `
+    <div class="meta-build-chip">
+      <img src="${sprite(b.dex)}" alt="${escapeAttr(b.nombre)}" loading="lazy">
+      <div class="meta-build-body">
+        <div class="meta-build-name">
+          ${escapeHtml(b.nombre)}
+          <span class="team-editbar" style="margin-left:auto;">
+            <button class="icon-btn" title="Editar" onclick="openMetaBuildForm('${formato}', ${i})">✎</button>
+            <button class="icon-btn danger" title="Eliminar" onclick="deleteMetaBuild('${formato}', ${i})">✕</button>
+          </span>
+        </div>
+        <div class="meta-build-item">${escapeHtml(b.item || '')}</div>
+        ${(b.movs && b.movs.filter(Boolean).length) ? `<div class="meta-build-movs">${b.movs.filter(Boolean).map(escapeHtml).join(' · ')}</div>` : ''}
+        <div class="usage-bar"><div class="usage-bar-fill" style="width:${Math.round(((b.usos||0)/max)*100)}%"></div></div>
+        <span class="usage-count">${b.usos || 0} torneos</span>
+      </div>
+    </div>
+  `).join('');
+}
+
+/* ---- Equipos del meta ---- */
+function renderMetaMonsEditor(){
+  const el = document.getElementById('metaMonsEditor');
+  if(!el) return;
+  el.innerHTML = metaFormMons.map((m,i) => `
+    <div class="mons-editor-row" style="grid-template-columns:1fr auto;">
+      <select onchange="updateMetaMon(${i}, this.value)">
+        ${POKEDEX_SPECIES.map(([dex,nombre]) => `<option value="${dex}|${escapeAttr(nombre)}" ${m.dex==dex?'selected':''}>${nombre}</option>`).join('')}
+      </select>
+      <button type="button" class="icon-btn danger" onclick="removeMetaMonRow(${i})">✕</button>
+    </div>
+  `).join('') || '<p style="color:var(--text-muted); font-size:12px;">Sin Pokémon todavía — agrega al menos uno.</p>';
+}
+function addMetaMonRow(){
+  const [dex, nombre] = POKEDEX_SPECIES[0] || [1, 'Bulbasaur'];
+  metaFormMons.push({ dex, nombre });
+  renderMetaMonsEditor();
+}
+function updateMetaMon(i, val){
+  const [dex, nombre] = val.split('|');
+  metaFormMons[i] = { dex: Number(dex), nombre };
+}
+function removeMetaMonRow(i){ metaFormMons.splice(i,1); renderMetaMonsEditor(); }
+
+function openMetaEquipoForm(formato, index){
+  editingMetaFormato = formato;
+  editingMetaEquipoIndex = (typeof index === 'number') ? index : null;
+  if(!META[formato]) META[formato] = { equipos:[], estrategias:[], builds:[] };
+  const t = editingMetaEquipoIndex !== null ? META[formato].equipos[editingMetaEquipoIndex] : { nombre:'', arquetipo:'', usos:0, mons:[] };
+  metaFormMons = JSON.parse(JSON.stringify(t.mons || []));
+  openModal(`
+    <h3>${editingMetaEquipoIndex!==null?'Editar equipo':'Nuevo equipo'} del meta (${formato==='singles'?'Singles':'Doubles'})</h3>
+    <div class="field-row">
+      <div class="field"><label>Nombre</label><input id="meNombre" value="${escapeAttr(t.nombre)}" placeholder="Ej. Hazard Stack"></div>
+      <div class="field"><label>Usado en cuántos torneos</label><input id="meUsos" type="number" min="0" value="${t.usos||0}" placeholder="Ej. 14"></div>
+    </div>
+    <div class="field"><label>Arquetipo</label><input id="meArquetipo" value="${escapeAttr(t.arquetipo)}" placeholder="Ej. Stall / hazards"></div>
+    <div class="field"><label>Pokémon del equipo</label>
+      <div class="mons-editor" id="metaMonsEditor"></div>
+      <button type="button" class="btn btn--ghost btn--sm" onclick="addMetaMonRow()">+ Agregar Pokémon</button>
+    </div>
+    <div class="modal-actions">
+      ${editingMetaEquipoIndex!==null ? `<button class="btn btn--ghost btn--sm" style="color:var(--red);border-color:var(--red);" onclick="deleteMetaEquipo('${formato}', ${editingMetaEquipoIndex})">Eliminar</button>` : ''}
+      <button class="btn btn--ghost btn--sm" onclick="closeModal()">Cancelar</button>
+      <button class="btn btn--primary btn--sm" onclick="saveMetaEquipoForm()">Guardar</button>
+    </div>
+  `);
+  renderMetaMonsEditor();
+}
+
+async function saveMetaEquipoForm(){
+  const nombre = document.getElementById('meNombre').value.trim();
+  if(!nombre){ alert('Ponle un nombre al equipo.'); return; }
+  if(metaFormMons.length === 0){ alert('Agrega al menos un Pokémon al equipo.'); return; }
+  const data = {
+    nombre,
+    arquetipo: document.getElementById('meArquetipo').value.trim(),
+    usos: Number(document.getElementById('meUsos').value) || 0,
+    mons: metaFormMons
+  };
+  if(!META[editingMetaFormato]) META[editingMetaFormato] = { equipos:[], estrategias:[], builds:[] };
+  if(!META[editingMetaFormato].equipos) META[editingMetaFormato].equipos = [];
+  if(editingMetaEquipoIndex !== null) META[editingMetaFormato].equipos[editingMetaEquipoIndex] = data;
+  else META[editingMetaFormato].equipos.push(data);
+  await persist('meta', META, `Actualiza equipo del meta: ${nombre}`);
+  renderMetaAdmin(currentMetaFmt);
+  closeModal();
+}
+
+async function deleteMetaEquipo(formato, index){
+  if(!confirm('¿Eliminar este equipo del meta?')) return;
+  const nombre = META[formato].equipos[index].nombre;
+  META[formato].equipos.splice(index, 1);
+  await persist('meta', META, `Elimina equipo del meta: ${nombre}`);
+  renderMetaAdmin(currentMetaFmt);
+  closeModal();
+}
+
+/* ---- Estrategias del meta ---- */
+function openMetaEstrategiaForm(formato, index){
+  editingMetaFormato = formato;
+  editingMetaEstrategiaIndex = (typeof index === 'number') ? index : null;
+  if(!META[formato]) META[formato] = { equipos:[], estrategias:[], builds:[] };
+  const e = editingMetaEstrategiaIndex !== null ? META[formato].estrategias[editingMetaEstrategiaIndex] : { nombre:'', descripcion:'', usos:0 };
+  openModal(`
+    <h3>${editingMetaEstrategiaIndex!==null?'Editar estrategia':'Nueva estrategia'} (${formato==='singles'?'Singles':'Doubles'})</h3>
+    <div class="field-row">
+      <div class="field"><label>Nombre</label><input id="msNombre" value="${escapeAttr(e.nombre)}" placeholder="Ej. Hazard Stack + desgaste"></div>
+      <div class="field"><label>Usada en cuántos torneos</label><input id="msUsos" type="number" min="0" value="${e.usos||0}" placeholder="Ej. 18"></div>
+    </div>
+    <div class="field"><label>Descripción</label><textarea id="msDescripcion">${escapeHtml(e.descripcion)}</textarea></div>
+    <div class="modal-actions">
+      ${editingMetaEstrategiaIndex!==null ? `<button class="btn btn--ghost btn--sm" style="color:var(--red);border-color:var(--red);" onclick="deleteMetaEstrategia('${formato}', ${editingMetaEstrategiaIndex})">Eliminar</button>` : ''}
+      <button class="btn btn--ghost btn--sm" onclick="closeModal()">Cancelar</button>
+      <button class="btn btn--primary btn--sm" onclick="saveMetaEstrategiaForm()">Guardar</button>
+    </div>
+  `);
+}
+
+async function saveMetaEstrategiaForm(){
+  const nombre = document.getElementById('msNombre').value.trim();
+  if(!nombre){ alert('Ponle un nombre a la estrategia.'); return; }
+  const data = {
+    nombre,
+    descripcion: document.getElementById('msDescripcion').value.trim(),
+    usos: Number(document.getElementById('msUsos').value) || 0
+  };
+  if(!META[editingMetaFormato]) META[editingMetaFormato] = { equipos:[], estrategias:[], builds:[] };
+  if(!META[editingMetaFormato].estrategias) META[editingMetaFormato].estrategias = [];
+  if(editingMetaEstrategiaIndex !== null) META[editingMetaFormato].estrategias[editingMetaEstrategiaIndex] = data;
+  else META[editingMetaFormato].estrategias.push(data);
+  await persist('meta', META, `Actualiza estrategia del meta: ${nombre}`);
+  renderMetaAdmin(currentMetaFmt);
+  closeModal();
+}
+
+async function deleteMetaEstrategia(formato, index){
+  if(!confirm('¿Eliminar esta estrategia del meta?')) return;
+  const nombre = META[formato].estrategias[index].nombre;
+  META[formato].estrategias.splice(index, 1);
+  await persist('meta', META, `Elimina estrategia del meta: ${nombre}`);
+  renderMetaAdmin(currentMetaFmt);
+  closeModal();
+}
+
+/* ---- Builds del meta (independientes de la Pokédex) ---- */
+function openMetaBuildForm(formato, index){
+  editingMetaFormato = formato;
+  editingMetaBuildIndex = (typeof index === 'number') ? index : null;
+  if(!META[formato]) META[formato] = { equipos:[], estrategias:[], builds:[] };
+  const first = POKEDEX_SPECIES[0] || [1, 'Bulbasaur'];
+  const b = editingMetaBuildIndex !== null ? META[formato].builds[editingMetaBuildIndex] : { dex:first[0], nombre:first[1], item:'', movs:['','','',''], usos:0, nota:'' };
+  const movs = b.movs || ['','','',''];
+  openModal(`
+    <h3>${editingMetaBuildIndex!==null?'Editar build':'Nueva build'} del meta (${formato==='singles'?'Singles':'Doubles'})</h3>
+    <div class="field-row">
+      <div class="field"><label>Pokémon</label>
+        <select id="mbMon">
+          ${POKEDEX_SPECIES.map(([dex,nombre]) => `<option value="${dex}|${escapeAttr(nombre)}" ${b.dex==dex?'selected':''}>${nombre}</option>`).join('')}
+        </select>
+      </div>
+      <div class="field"><label>Usada en cuántos torneos</label><input id="mbUsos" type="number" min="0" value="${b.usos||0}" placeholder="Ej. 27"></div>
+    </div>
+    <div class="field"><label>Objeto</label><input id="mbItem" value="${escapeAttr(b.item)}" placeholder="Ej. Choice Scarf"></div>
+    <div class="field-row-4">
+      <div class="field"><label>Movimiento 1</label><input id="mbMov1" value="${escapeAttr(movs[0])}"></div>
+      <div class="field"><label>Movimiento 2</label><input id="mbMov2" value="${escapeAttr(movs[1])}"></div>
+      <div class="field"><label>Movimiento 3</label><input id="mbMov3" value="${escapeAttr(movs[2])}"></div>
+      <div class="field"><label>Movimiento 4</label><input id="mbMov4" value="${escapeAttr(movs[3])}"></div>
+    </div>
+    <div class="field"><label>Nota</label><input id="mbNota" value="${escapeAttr(b.nota)}" placeholder="Ej. Revenge kill / cierre"></div>
+    <div class="modal-actions">
+      ${editingMetaBuildIndex!==null ? `<button class="btn btn--ghost btn--sm" style="color:var(--red);border-color:var(--red);" onclick="deleteMetaBuild('${formato}', ${editingMetaBuildIndex})">Eliminar</button>` : ''}
+      <button class="btn btn--ghost btn--sm" onclick="closeModal()">Cancelar</button>
+      <button class="btn btn--primary btn--sm" onclick="saveMetaBuildForm()">Guardar</button>
+    </div>
+  `);
+}
+
+async function saveMetaBuildForm(){
+  const [dex, nombre] = document.getElementById('mbMon').value.split('|');
+  const data = {
+    dex: Number(dex),
+    nombre,
+    item: document.getElementById('mbItem').value.trim(),
+    movs: [
+      document.getElementById('mbMov1').value.trim(),
+      document.getElementById('mbMov2').value.trim(),
+      document.getElementById('mbMov3').value.trim(),
+      document.getElementById('mbMov4').value.trim()
+    ],
+    usos: Number(document.getElementById('mbUsos').value) || 0,
+    nota: document.getElementById('mbNota').value.trim()
+  };
+  if(!META[editingMetaFormato]) META[editingMetaFormato] = { equipos:[], estrategias:[], builds:[] };
+  if(!META[editingMetaFormato].builds) META[editingMetaFormato].builds = [];
+  if(editingMetaBuildIndex !== null) META[editingMetaFormato].builds[editingMetaBuildIndex] = data;
+  else META[editingMetaFormato].builds.push(data);
+  await persist('meta', META, `Actualiza build del meta: ${nombre}`);
+  renderMetaAdmin(currentMetaFmt);
+  closeModal();
+}
+
+async function deleteMetaBuild(formato, index){
+  if(!confirm('¿Eliminar esta build del meta?')) return;
+  const nombre = META[formato].builds[index].nombre;
+  META[formato].builds.splice(index, 1);
+  await persist('meta', META, `Elimina build del meta: ${nombre}`);
+  renderMetaAdmin(currentMetaFmt);
+  closeModal();
+}
+
+/* ============================================================
    POKÉDEX BUILDS
    ============================================================ */
 function renderPokedex(filter){
@@ -884,6 +1206,7 @@ document.querySelectorAll('.switch').forEach(sw => {
     const fmt = btn.dataset.fmt;
     if(sw.dataset.group === 'tier') renderTierList(fmt);
     if(sw.dataset.group === 'teams') renderEquipos(fmt);
+    if(sw.dataset.group === 'meta') renderMetaAdmin(fmt);
   });
 });
 

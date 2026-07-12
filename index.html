@@ -19,6 +19,7 @@
       <a href="#liga">Liga</a>
       <a href="#playoffs">Playoffs</a>
       <a href="#tierlist">Tier List</a>
+      <a href="#meta">Meta</a>
       <a href="#pokedex">Pokédex</a>
       <a href="#equipos">Equipos</a>
     </nav>
@@ -100,6 +101,30 @@
   </div>
 </section>
 
+<section id="meta">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <span class="eyebrow">Datos de competencia</span>
+        <h2>Meta del torneo</h2>
+      </div>
+      <div class="switch" data-group="meta">
+        <button data-fmt="singles" class="active">Singles</button>
+        <button data-fmt="doubles">Doubles</button>
+      </div>
+    </div>
+
+    <div class="meta-subhead"><h3>Equipos más usados en torneos</h3></div>
+    <div class="meta-equipos-grid" id="metaEquiposGrid"></div>
+
+    <div class="meta-subhead"><h3>Estrategias más usadas</h3></div>
+    <div id="metaEstrategiasList"></div>
+
+    <div class="meta-subhead"><h3>Builds más usadas de los Pokémon</h3></div>
+    <div class="meta-builds-grid" id="metaBuildsGrid"></div>
+  </div>
+</section>
+
 <section id="pokedex">
   <div class="wrap">
     <div class="section-head">
@@ -157,6 +182,7 @@
 let TORNEOS = [];
 let TIERS = {};
 let EQUIPOS = {};
+let META = {};
 let POKEDEX_SPECIES = [];
 let POKEDEX_BUILDS = {};
 let LIGA_CONFIG = {};
@@ -166,6 +192,7 @@ let LIGA_PLAYOFFS = {};
 
 let currentTierFmt = 'singles';
 let currentTeamFmt = 'singles';
+let currentMetaFmt = 'singles';
 
 const SPRITE_BASE = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/";
 const sprite = dex => `${SPRITE_BASE}${dex}.png`;
@@ -186,10 +213,11 @@ async function loadJSONSafe(path, fallback){
 
 async function loadAllData(){
   try{
-    [TORNEOS, TIERS, EQUIPOS, POKEDEX_SPECIES, POKEDEX_BUILDS, LIGA_CONFIG, LIGA_CALENDARIO, LIGA_JUGADORES, LIGA_PLAYOFFS] = await Promise.all([
+    [TORNEOS, TIERS, EQUIPOS, META, POKEDEX_SPECIES, POKEDEX_BUILDS, LIGA_CONFIG, LIGA_CALENDARIO, LIGA_JUGADORES, LIGA_PLAYOFFS] = await Promise.all([
       loadJSON('data/torneos.json'),
       loadJSON('data/tiers.json'),
       loadJSON('data/equipos.json'),
+      loadJSONSafe('data/meta.json', { singles:{equipos:[],estrategias:[],builds:[]}, doubles:{equipos:[],estrategias:[],builds:[]} }),
       loadJSON('data/pokedex_species.json'),
       loadJSON('data/pokedex_builds.json'),
       loadJSON('data/liga_config.json'),
@@ -482,6 +510,89 @@ function renderTierList(formato){
     `).join("") || `<p style="color:var(--text-muted); font-family:var(--font-mono); font-size:13px;">Todavía no hay Pokémon en esta tier list.</p>`;
 }
 
+/* ------------------------------------------------------------
+   META DEL TORNEO — equipos, estrategias y builds más usados.
+   El número de usos lo carga el administrador a mano (cuántos
+   torneos vio ese equipo/estrategia/build); aquí solo se ordena
+   de mayor a menor y se dibuja la barra de uso relativa.
+   ------------------------------------------------------------ */
+function renderMetaEquipos(list){
+  const grid = document.getElementById('metaEquiposGrid');
+  if(!list.length){
+    grid.innerHTML = `<p style="color:var(--text-muted); font-family:var(--font-mono); font-size:13px;">Todavía no hay equipos registrados en el meta.</p>`;
+    return;
+  }
+  const ordenado = [...list].sort((a,b) => (b.usos||0) - (a.usos||0));
+  const max = Math.max(1, ...ordenado.map(e => e.usos||0));
+  grid.innerHTML = ordenado.map((eq, i) => `
+    <div class="hud-box meta-team-card ${i===0 ? 'is-top' : ''}">
+      <div class="meta-team-head">
+        <span class="rank-badge ${i===0 ? 'is-top' : ''}">#${i+1}</span>
+        <h4>${escapeHtml(eq.nombre)}</h4>
+      </div>
+      <div class="meta-team-archetype">${escapeHtml(eq.arquetipo || '')}</div>
+      <div class="usage-bar"><div class="usage-bar-fill" style="width:${Math.round(((eq.usos||0)/max)*100)}%"></div></div>
+      <span class="usage-count">${eq.usos || 0} torneos</span>
+      <div class="meta-team-mons">
+        ${(eq.mons||[]).map(m => `<img src="${sprite(m.dex)}" alt="${escapeAttr(m.nombre)}" title="${escapeAttr(m.nombre)}" loading="lazy">`).join('')}
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderMetaEstrategias(list){
+  const cont = document.getElementById('metaEstrategiasList');
+  if(!list.length){
+    cont.innerHTML = `<p style="color:var(--text-muted); font-family:var(--font-mono); font-size:13px;">Todavía no hay estrategias registradas.</p>`;
+    return;
+  }
+  const ordenado = [...list].sort((a,b) => (b.usos||0) - (a.usos||0));
+  const max = Math.max(1, ...ordenado.map(e => e.usos||0));
+  cont.innerHTML = ordenado.map((e, i) => `
+    <div class="meta-strategy-row">
+      <span class="rank-badge ${i===0 ? 'is-top' : ''}">#${i+1}</span>
+      <div class="meta-strategy-body">
+        <div class="meta-strategy-name">${escapeHtml(e.nombre)}</div>
+        ${e.descripcion ? `<div class="meta-strategy-desc">${escapeHtml(e.descripcion)}</div>` : ''}
+      </div>
+      <div class="meta-strategy-usage">
+        <span class="usage-count">${e.usos || 0} torneos</span>
+        <div class="usage-bar"><div class="usage-bar-fill" style="width:${Math.round(((e.usos||0)/max)*100)}%"></div></div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderMetaBuilds(list){
+  const grid = document.getElementById('metaBuildsGrid');
+  if(!list.length){
+    grid.innerHTML = `<p style="color:var(--text-muted); font-family:var(--font-mono); font-size:13px;">Todavía no hay builds registradas.</p>`;
+    return;
+  }
+  const ordenado = [...list].sort((a,b) => (b.usos||0) - (a.usos||0));
+  const max = Math.max(1, ...ordenado.map(e => e.usos||0));
+  grid.innerHTML = ordenado.map((b, i) => `
+    <div class="meta-build-chip">
+      <img src="${sprite(b.dex)}" alt="${escapeAttr(b.nombre)}" loading="lazy">
+      <div class="meta-build-body">
+        <div class="meta-build-name"><span class="rank-badge rank-badge--sm ${i===0 ? 'is-top' : ''}">#${i+1}</span> ${escapeHtml(b.nombre)}</div>
+        <div class="meta-build-item">${escapeHtml(b.item || '')}</div>
+        ${(b.movs && b.movs.filter(Boolean).length) ? `<div class="meta-build-movs">${b.movs.filter(Boolean).map(escapeHtml).join(' · ')}</div>` : ''}
+        <div class="usage-bar"><div class="usage-bar-fill" style="width:${Math.round(((b.usos||0)/max)*100)}%"></div></div>
+        <span class="usage-count">${b.usos || 0} torneos</span>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderMeta(formato){
+  currentMetaFmt = formato;
+  const data = META[formato] || {};
+  renderMetaEquipos(data.equipos || []);
+  renderMetaEstrategias(data.estrategias || []);
+  renderMetaBuilds(data.builds || []);
+}
+
 function renderEquipos(formato){
   currentTeamFmt = formato;
   const grid = document.getElementById("teamGrid");
@@ -588,6 +699,7 @@ document.querySelectorAll('.switch').forEach(sw => {
     const fmt = btn.dataset.fmt;
     if(sw.dataset.group === 'tier') renderTierList(fmt);
     if(sw.dataset.group === 'teams') renderEquipos(fmt);
+    if(sw.dataset.group === 'meta') renderMeta(fmt);
   });
 });
 
@@ -598,6 +710,7 @@ document.querySelectorAll('.switch').forEach(sw => {
   renderStandings();
   renderPlayoffs();
   renderTierList('singles');
+  renderMeta('singles');
   renderEquipos('singles');
   renderPokedex('');
 })();

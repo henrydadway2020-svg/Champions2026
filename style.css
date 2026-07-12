@@ -327,6 +327,71 @@ section + section{border-top:1px solid var(--border);}
 .team-editbar{display:flex; gap:6px;}
 
 /* ======================================================
+   META DEL TORNEO
+   ====================================================== */
+.meta-subhead{
+  display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;
+  margin:36px 0 16px;
+}
+.meta-subhead:first-of-type{margin-top:4px;}
+.meta-subhead h3{
+  font-family:var(--font-mono); font-size:12.5px; text-transform:uppercase; letter-spacing:0.1em;
+  color:var(--text-muted); display:flex; align-items:center; gap:8px;
+}
+.meta-subhead h3::before{content:"◆"; color:var(--gold); font-size:9px;}
+
+.rank-badge{
+  font-family:var(--font-mono); font-size:11px; font-weight:700;
+  width:26px; height:26px; border-radius:50%; flex-shrink:0;
+  display:inline-flex; align-items:center; justify-content:center;
+  background:var(--surface-2); border:1px solid var(--border); color:var(--text-muted);
+}
+.rank-badge.is-top{background:var(--gold); color:#14161C; border-color:var(--gold);}
+.rank-badge--sm{width:18px; height:18px; font-size:9px;}
+
+.usage-bar{
+  height:6px; background:var(--surface-2); border:1px solid var(--border); overflow:hidden; margin:8px 0 6px;
+}
+.usage-bar-fill{height:100%; background:linear-gradient(90deg, var(--gold-dim), var(--gold));}
+.usage-count{font-family:var(--font-mono); font-size:11px; color:var(--gold); white-space:nowrap;}
+
+/* equipos más usados */
+.meta-equipos-grid{display:grid; grid-template-columns:repeat(auto-fill, minmax(300px,1fr)); gap:18px;}
+.meta-team-card{padding:20px;}
+.meta-team-card.is-top{border-color:var(--gold-dim); box-shadow:0 0 0 1px rgba(231,177,10,.16);}
+.meta-team-head{display:flex; align-items:center; gap:10px; margin-bottom:6px;}
+.meta-team-head h4{font-size:17px; text-transform:uppercase; flex:1; min-width:0;}
+.meta-team-archetype{font-family:var(--font-mono); font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.04em;}
+.meta-team-mons{display:flex; gap:6px; flex-wrap:wrap; margin-top:10px;}
+.meta-team-mons img{width:36px; height:36px; object-fit:contain; background:var(--surface-2); border:1px solid var(--border); border-radius:4px;}
+
+/* estrategias más usadas */
+.meta-strategy-row{
+  display:flex; align-items:center; gap:14px; padding:14px 16px;
+  background:var(--surface); border:1px solid var(--border); margin-bottom:10px;
+}
+.meta-strategy-body{flex:1; min-width:0;}
+.meta-strategy-name{font-weight:600; font-size:14px;}
+.meta-strategy-desc{font-size:12.5px; color:var(--text-muted); margin-top:3px;}
+.meta-strategy-usage{width:170px; flex-shrink:0; text-align:right;}
+.meta-strategy-usage .usage-bar{margin:6px 0 0;}
+
+/* builds más usadas */
+.meta-builds-grid{display:grid; grid-template-columns:repeat(auto-fill, minmax(220px,1fr)); gap:12px;}
+.meta-build-chip{display:flex; gap:10px; padding:12px; background:var(--surface); border:1px solid var(--border);}
+.meta-build-chip img{width:46px; height:46px; object-fit:contain; background:var(--surface-2); border-radius:4px; flex-shrink:0;}
+.meta-build-body{flex:1; min-width:0;}
+.meta-build-name{font-weight:600; font-size:13.5px; display:flex; align-items:center; gap:6px;}
+.meta-build-item{font-family:var(--font-mono); font-size:10.5px; color:var(--gold); margin-top:3px;}
+.meta-build-movs{font-size:10.5px; color:var(--text-muted); margin-top:4px; line-height:1.4;}
+.meta-build-body .usage-bar{margin:8px 0 4px;}
+
+@media (max-width:640px){
+  .meta-strategy-row{flex-wrap:wrap;}
+  .meta-strategy-usage{width:100%; text-align:left;}
+}
+
+/* ======================================================
    POKÉDEX
    ====================================================== */
 .pokedex-toolbar{display:flex; gap:12px; align-items:center; flex-wrap:wrap; margin-bottom:22px;}
@@ -548,7 +613,7 @@ footer .note{max-width:520px;}
 .champion-card .pend{font-family:var(--font-mono); font-size:12px; font-style:italic; text-transform:none;}
 
 @media (max-width:900px){
-  .team-grid, .tourney-grid{grid-template-columns:repeat(auto-fill, minmax(260px,1fr));}
+  .team-grid, .tourney-grid, .meta-equipos-grid{grid-template-columns:repeat(auto-fill, minmax(260px,1fr));}
 }
 
 @media (max-width:640px){
