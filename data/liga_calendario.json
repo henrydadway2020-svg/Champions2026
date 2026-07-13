@@ -205,7 +205,10 @@
         "id": 23,
         "jugadorA": "Skaires",
         "jugadorB": "Elbolas",
-        "resultado": null
+        "resultado": {
+          "ganador": "Elbolas",
+          "marcador": "2-0"
+        }
       },
       {
         "id": 24,
