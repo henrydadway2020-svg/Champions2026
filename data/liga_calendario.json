@@ -178,7 +178,10 @@
         "id": 19,
         "jugadorA": "JOS896",
         "jugadorB": "Akira",
-        "resultado": null
+        "resultado": {
+          "ganador": "Akira",
+          "marcador": "2-0"
+        }
       },
       {
         "id": 20,
