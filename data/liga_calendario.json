@@ -205,7 +205,10 @@
         "id": 24,
         "jugadorA": "Vik",
         "jugadorB": "Gush",
-        "resultado": null
+        "resultado": {
+          "ganador": "Gush",
+          "marcador": "2-0"
+        }
       }
     ]
   },
