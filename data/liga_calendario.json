@@ -163,7 +163,10 @@
         "id": 17,
         "jugadorA": "Omega",
         "jugadorB": "Vivi1600",
-        "resultado": null
+        "resultado": {
+          "ganador": "Omega",
+          "marcador": "2-0"
+        }
       },
       {
         "id": 18,
