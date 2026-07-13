@@ -193,7 +193,10 @@
         "id": 22,
         "jugadorA": "Lelouch",
         "jugadorB": "RedWarrior",
-        "resultado": null
+        "resultado": {
+          "ganador": "Lelouch",
+          "marcador": "2-0"
+        }
       },
       {
         "id": 23,
