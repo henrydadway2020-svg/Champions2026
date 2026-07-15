@@ -259,7 +259,10 @@
         "id": 27,
         "jugadorA": "Bryvil",
         "jugadorB": "Sukuna",
-        "resultado": null
+        "resultado": {
+          "ganador": "Sukuna",
+          "marcador": "2-0"
+        }
       },
       {
         "id": 28,
