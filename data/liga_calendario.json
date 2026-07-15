@@ -295,7 +295,10 @@
         "id": 32,
         "jugadorA": "Skaires",
         "jugadorB": "Vik",
-        "resultado": null
+        "resultado": {
+          "ganador": "Skaires",
+          "marcador": "2-0"
+        }
       }
     ]
   },
