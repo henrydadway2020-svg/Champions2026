@@ -268,7 +268,10 @@
         "id": 28,
         "jugadorA": "JOS896",
         "jugadorB": "RoninMx",
-        "resultado": null
+        "resultado": {
+          "ganador": "RoninMx",
+          "marcador": "2-1"
+        }
       },
       {
         "id": 29,
