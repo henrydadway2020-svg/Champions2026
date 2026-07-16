@@ -274,7 +274,10 @@
         "id": 29,
         "jugadorA": "GAGC",
         "jugadorB": "RedWarrior",
-        "resultado": null
+        "resultado": {
+          "ganador": "RedWarrior",
+          "marcador": "2-1"
+        }
       },
       {
         "id": 30,
