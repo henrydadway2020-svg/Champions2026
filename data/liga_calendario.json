@@ -355,7 +355,10 @@
         "id": 39,
         "jugadorA": "Ekko",
         "jugadorB": "Vik",
-        "resultado": null
+        "resultado": {
+          "ganador": "Ekko",
+          "marcador": "2-1"
+        }
       },
       {
         "id": 40,
