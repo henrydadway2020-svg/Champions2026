@@ -364,7 +364,10 @@
         "id": 40,
         "jugadorA": "Lelouch",
         "jugadorB": "Skaires",
-        "resultado": null
+        "resultado": {
+          "ganador": "Skaires",
+          "marcador": "2-1"
+        }
       }
     ]
   },
