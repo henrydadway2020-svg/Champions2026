@@ -337,7 +337,10 @@
         "id": 36,
         "jugadorA": "Bryvil",
         "jugadorB": "RedWarrior",
-        "resultado": null
+        "resultado": {
+          "ganador": "RedWarrior",
+          "marcador": "2-0"
+        }
       },
       {
         "id": 37,
