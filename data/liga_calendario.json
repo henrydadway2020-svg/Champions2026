@@ -412,7 +412,10 @@
         "id": 43,
         "jugadorA": "Jhpkm",
         "jugadorB": "RedWarrior",
-        "resultado": null
+        "resultado": {
+          "ganador": "Jhpkm",
+          "marcador": "2-0"
+        }
       },
       {
         "id": 44,
