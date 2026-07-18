@@ -415,7 +415,10 @@
         "id": 44,
         "jugadorA": "Vivi1600",
         "jugadorB": "Elbolas",
-        "resultado": null
+        "resultado": {
+          "ganador": "Elbolas",
+          "marcador": "2-0"
+        }
       },
       {
         "id": 45,
