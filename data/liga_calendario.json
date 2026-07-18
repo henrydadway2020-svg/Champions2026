@@ -436,7 +436,10 @@
         "id": 47,
         "jugadorA": "GAGC",
         "jugadorB": "Skaires",
-        "resultado": null
+        "resultado": {
+          "ganador": "GAGC",
+          "marcador": "2-1"
+        }
       },
       {
         "id": 48,
