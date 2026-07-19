@@ -82,7 +82,16 @@
     },
     {
       "nombre": "ElBoli",
-      "entradas": []
+      "entradas": [
+        {
+          "url": "https://raw.githubusercontent.com/henrydadway2020-svg/Champions2026/main/data/img/historial/elboli-1784424999136.jpg",
+          "path": "data/img/historial/elboli-1784424999136.jpg",
+          "sha": "c4114ef0c8e67b49b0382cfc4a94bf0b53867e31",
+          "ronda": "Fase de grupos",
+          "nota": "",
+          "fecha": "2026-07-19T01:36:39.988Z"
+        }
+      ]
     },
     {
       "nombre": "Romanioli",
