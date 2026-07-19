@@ -312,6 +312,27 @@ section + section{border-top:1px solid var(--border);}
 /* ======================================================
    EQUIPOS
    ====================================================== */
+.historial-etapa{display:flex; align-items:center;}
+.historial-intro{color:var(--text-muted); font-size:13.5px; margin:-8px 0 20px;}
+.historial-grid{display:grid; grid-template-columns:repeat(auto-fill, minmax(280px,1fr)); gap:18px;}
+.historial-card{padding:20px;}
+.historial-card-head{display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:14px;}
+.historial-card-head h3{font-size:18px; text-transform:uppercase;}
+.historial-thumbs{display:flex; flex-wrap:wrap; gap:8px; margin-bottom:14px;}
+.historial-thumb{
+  position:relative; width:76px; height:76px; overflow:hidden;
+  background:var(--surface-2); border:1px solid var(--border); border-radius:4px; cursor:pointer;
+}
+.historial-thumb:hover{border-color:var(--gold);}
+.historial-thumb img{width:100%; height:100%; object-fit:cover;}
+.historial-thumb-tag{
+  position:absolute; left:0; right:0; bottom:0;
+  background:rgba(14,16,21,0.82); color:var(--text);
+  font-family:var(--font-mono); font-size:8.5px; text-transform:uppercase; letter-spacing:0.03em;
+  padding:3px 4px; text-align:center; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+.historial-empty{color:var(--text-muted); font-size:12px; margin:0;}
+
 .team-grid{display:grid; grid-template-columns:repeat(auto-fill, minmax(340px,1fr)); gap:20px;}
 .team-card{padding:22px;}
 .team-head{display:flex; justify-content:space-between; align-items:flex-start; gap:10px; margin-bottom:6px;}

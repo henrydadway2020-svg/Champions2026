@@ -25,6 +25,7 @@
       <a href="#tierlist">Tier List</a>
       <a href="#meta">Meta</a>
       <a href="#equipos">Equipos</a>
+      <a href="#historial">Historial</a>
       <a href="#pokedex">Pokédex</a>
       <a href="#especies">Roster</a>
       <a href="index.html" class="admin-link">Ver sitio público →</a>
@@ -140,6 +141,15 @@
       <div class="team-grid" id="teamGrid"></div>
     </section>
 
+    <section id="historial">
+      <div class="section-head">
+        <div><span class="eyebrow" id="historialEyebrow">Torneo</span><h2>Historial de equipos</h2></div>
+        <div class="section-actions"><button class="btn btn--ghost btn--sm" onclick="openHistorialConfigForm()">✎ Editar torneo</button></div>
+      </div>
+      <p class="hint" style="color:var(--text-muted); font-size:13px; margin-bottom:14px;">Sube una foto o captura del equipo que usó cada jugador en cada ronda de los playoffs. Las imágenes se suben directo a tu repo de GitHub y se van acumulando — no se pierde lo anterior. Recomendado: imágenes menores a 8 MB.</p>
+      <div class="historial-grid" id="historialGrid"></div>
+    </section>
+
     <section id="pokedex">
       <div class="section-head">
         <div><span class="eyebrow">Base de datos</span><h2>Pokédex Champions</h2></div>
@@ -190,8 +200,13 @@ const FILES = {
   liga_config: 'data/liga_config.json',
   liga_calendario: 'data/liga_calendario.json',
   liga_jugadores: 'data/liga_jugadores.json',
-  liga_playoffs: 'data/liga_playoffs.json'
+  liga_playoffs: 'data/liga_playoffs.json',
+  historial_equipos: 'data/historial_equipos.json'
 };
+const DEFAULT_HISTORIAL_JUGADORES = [
+  "Gagc","Whitedragons","Akira","Kuki","Gcerbat","Rhoads","ElBoli","Romanioli",
+  "Hunter Walls","Juansmo","TheSherman","Berjo","Jefe Tribal","Izmaa","Jhpkm","Sukuna"
+].map(nombre => ({ nombre, entradas: [] }));
 const DEFAULTS = {
   torneos: [],
   tiers: { singles:{}, doubles:{} },
@@ -202,12 +217,15 @@ const DEFAULTS = {
   liga_config: {},
   liga_calendario: [],
   liga_jugadores: [],
-  liga_playoffs: {}
+  liga_playoffs: {},
+  historial_equipos: { torneo: "GENERAL Victory Road", etapa: "Playoffs", jugadores: DEFAULT_HISTORIAL_JUGADORES }
 };
 let SHAS = {};
 
 let TORNEOS = [], TIERS = {}, EQUIPOS = {}, META = {}, POKEDEX_SPECIES = [], POKEDEX_BUILDS = {};
 let LIGA_CONFIG = {}, LIGA_CALENDARIO = [], LIGA_JUGADORES = [], LIGA_PLAYOFFS = {};
+let HISTORIAL = { torneo:'', etapa:'', jugadores:[] };
+let editingHistorialJugador = null;
 let ligaFechaSeleccionada = 1;
 let currentTierFmt = 'singles';
 let currentTeamFmt = 'singles';
@@ -308,10 +326,13 @@ async function connectAndLoad(){
   localStorage.setItem(CONFIG_KEY, JSON.stringify(CONFIG));
   setStatus('Conectando...', null);
   try{
-    [TORNEOS, TIERS, EQUIPOS, META, POKEDEX_SPECIES, POKEDEX_BUILDS, LIGA_CONFIG, LIGA_CALENDARIO, LIGA_JUGADORES, LIGA_PLAYOFFS] = await Promise.all([
+    [TORNEOS, TIERS, EQUIPOS, META, POKEDEX_SPECIES, POKEDEX_BUILDS, LIGA_CONFIG, LIGA_CALENDARIO, LIGA_JUGADORES, LIGA_PLAYOFFS, HISTORIAL] = await Promise.all([
       loadFile('torneos'), loadFile('tiers'), loadFile('equipos'), loadFile('meta'), loadFile('pokedex_species'), loadFile('pokedex_builds'),
-      loadFile('liga_config'), loadFile('liga_calendario'), loadFile('liga_jugadores'), loadFile('liga_playoffs')
+      loadFile('liga_config'), loadFile('liga_calendario'), loadFile('liga_jugadores'), loadFile('liga_playoffs'), loadFile('historial_equipos')
     ]);
+    if(!HISTORIAL || !Array.isArray(HISTORIAL.jugadores) || !HISTORIAL.jugadores.length){
+      HISTORIAL = JSON.parse(JSON.stringify(DEFAULTS.historial_equipos));
+    }
     document.getElementById('adminContent').style.display = 'block';
     setStatus(`✓ Conectado a ${CONFIG.owner}/${CONFIG.repo} (${CONFIG.branch})`, true);
     renderTorneos();
@@ -322,6 +343,7 @@ async function connectAndLoad(){
     renderSpeciesAdmin();
     renderLigaAdmin();
     renderPlayoffsAdmin();
+    renderHistorialAdmin();
   }catch(e){
     setStatus('✕ No se pudo conectar: ' + e.message, false);
   }
@@ -1072,6 +1094,161 @@ async function deleteMetaBuild(formato, index){
   META[formato].builds.splice(index, 1);
   await persist('meta', META, `Elimina build del meta: ${nombre}`);
   renderMetaAdmin(currentMetaFmt);
+  closeModal();
+}
+
+/* ============================================================
+   HISTORIAL DE EQUIPOS — imágenes subidas por jugador/ronda.
+   Las imágenes se suben como archivos binarios al repo (carpeta
+   data/img/historial/) usando la misma API de GitHub Contents
+   que ya se usa para los JSON; solo aquí el contenido va en
+   base64 "crudo" (tal cual lo entrega el navegador), sin el
+   truco de encodeURIComponent que usamos para texto/JSON.
+   ============================================================ */
+function slugify(str){
+  return String(str).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+    .replace(/[^a-z0-9]+/g,'-').replace(/(^-+|-+$)/g,'') || 'jugador';
+}
+function fileToBase64(file){
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result).split(',')[1]);
+    reader.onerror = () => reject(new Error('No se pudo leer el archivo'));
+    reader.readAsDataURL(file);
+  });
+}
+async function uploadImageFile(file, jugadorNombre){
+  const base64 = await fileToBase64(file);
+  const ext = ((file.name.split('.').pop() || 'jpg').toLowerCase().replace(/[^a-z0-9]/g,'')) || 'jpg';
+  const path = `data/img/historial/${slugify(jugadorNombre)}-${Date.now()}.${ext}`;
+  const res = await ghRequest('PUT', path, { message: `Sube imagen de equipo: ${jugadorNombre}`, content: base64, branch: CONFIG.branch });
+  const url = `https://raw.githubusercontent.com/${CONFIG.owner}/${CONFIG.repo}/${CONFIG.branch}/${path}`;
+  return { url, path, sha: res.content.sha };
+}
+async function deleteImageFile(path, sha){
+  try{ await ghRequest('DELETE', path, { message: 'Elimina imagen de historial', sha, branch: CONFIG.branch }); }
+  catch(e){ console.warn('No se pudo borrar el archivo de imagen en GitHub (se quita igual del historial):', e.message); }
+}
+
+function renderHistorialAdmin(){
+  const eyebrow = document.getElementById('historialEyebrow');
+  if(eyebrow) eyebrow.textContent = HISTORIAL.torneo || 'Torneo';
+  const grid = document.getElementById('historialGrid');
+  if(!grid) return;
+  const jugadores = HISTORIAL.jugadores || [];
+  grid.innerHTML = jugadores.map((j, ji) => {
+    const entradas = j.entradas || [];
+    return `
+      <div class="hud-box historial-card">
+        <div class="historial-card-head">
+          <h3>${escapeHtml(j.nombre)}</h3>
+          <span class="tag">${entradas.length} ${entradas.length===1?'imagen':'imágenes'}</span>
+        </div>
+        <div class="historial-thumbs">
+          ${entradas.map((e,ei) => `
+            <div class="historial-thumb" onclick="viewHistorialEntry(${ji},${ei})">
+              <img src="${escapeAttr(e.url)}" alt="${escapeAttr(j.nombre)}" loading="lazy">
+              <span class="historial-thumb-tag">${escapeHtml(e.ronda || '—')}</span>
+            </div>
+          `).join('') || `<p class="historial-empty">Todavía no hay imágenes.</p>`}
+        </div>
+        <button class="btn btn--ghost btn--sm" onclick="openHistorialForm(${ji})">+ Agregar imagen</button>
+      </div>
+    `;
+  }).join('');
+}
+
+function openHistorialConfigForm(){
+  openModal(`
+    <h3>Datos del torneo</h3>
+    <div class="field"><label>Nombre del torneo</label><input id="hcTorneo" value="${escapeAttr(HISTORIAL.torneo)}" placeholder="Ej. GENERAL Victory Road"></div>
+    <div class="field"><label>Etapa actual</label><input id="hcEtapa" value="${escapeAttr(HISTORIAL.etapa)}" placeholder="Ej. Playoffs"></div>
+    <div class="modal-actions">
+      <button class="btn btn--ghost btn--sm" onclick="closeModal()">Cancelar</button>
+      <button class="btn btn--primary btn--sm" onclick="saveHistorialConfigForm()">Guardar</button>
+    </div>
+  `);
+}
+async function saveHistorialConfigForm(){
+  HISTORIAL.torneo = document.getElementById('hcTorneo').value.trim();
+  HISTORIAL.etapa = document.getElementById('hcEtapa').value.trim();
+  await persist('historial_equipos', HISTORIAL, `Actualiza datos del torneo en historial: ${HISTORIAL.torneo}`);
+  renderHistorialAdmin();
+  closeModal();
+}
+
+function openHistorialForm(ji){
+  editingHistorialJugador = ji;
+  const j = HISTORIAL.jugadores[ji];
+  openModal(`
+    <h3>Agregar imagen — ${escapeHtml(j.nombre)}</h3>
+    <div class="field"><label>Imagen del equipo</label><input type="file" id="hImgFile" accept="image/*"></div>
+    <div class="field"><label>Ronda</label>
+      <select id="hRonda">
+        <option value="Fase de grupos">Fase de grupos</option>
+        <option value="Octavos de final">Octavos de final</option>
+        <option value="Cuartos de final">Cuartos de final</option>
+        <option value="Semifinal">Semifinal</option>
+        <option value="Final">Final</option>
+        <option value="Tercer puesto">Tercer puesto</option>
+        <option value="Otra">Otra</option>
+      </select>
+    </div>
+    <div class="field"><label>Nota (opcional)</label><input id="hNota" placeholder="Ej. Cambió a Gholdengo por Corviknight"></div>
+    <div class="modal-actions">
+      <button class="btn btn--ghost btn--sm" onclick="closeModal()">Cancelar</button>
+      <button class="btn btn--primary btn--sm" onclick="saveHistorialForm()">Subir</button>
+    </div>
+  `);
+}
+
+async function saveHistorialForm(){
+  const ji = editingHistorialJugador;
+  const j = HISTORIAL.jugadores[ji];
+  const fileInput = document.getElementById('hImgFile');
+  const file = fileInput.files[0];
+  if(!file){ alert('Selecciona una imagen.'); return; }
+  if(file.size > 8 * 1024 * 1024){ alert('La imagen pesa más de 8 MB — usa una más liviana.'); return; }
+  const ronda = document.getElementById('hRonda').value;
+  const nota = document.getElementById('hNota').value.trim();
+  setStatus('Subiendo imagen a GitHub...', null);
+  try{
+    const { url, path, sha } = await uploadImageFile(file, j.nombre);
+    j.entradas = j.entradas || [];
+    j.entradas.push({ url, path, sha, ronda, nota, fecha: new Date().toISOString() });
+    await persist('historial_equipos', HISTORIAL, `Agrega imagen de equipo — ${j.nombre} (${ronda})`);
+    renderHistorialAdmin();
+    closeModal();
+  }catch(e){
+    alert('No se pudo subir la imagen: ' + e.message);
+    setStatus('✕ Error al subir imagen: ' + e.message, false);
+  }
+}
+
+function viewHistorialEntry(ji, ei){
+  const j = HISTORIAL.jugadores[ji];
+  const e = j.entradas[ei];
+  const fecha = e.fecha ? new Date(e.fecha).toLocaleDateString('es-ES', {year:'numeric', month:'long', day:'numeric'}) : '';
+  openModal(`
+    <h3>${escapeHtml(j.nombre)} — ${escapeHtml(e.ronda || '')}</h3>
+    <img src="${escapeAttr(e.url)}" style="width:100%; border-radius:4px; margin-bottom:14px;" alt="${escapeAttr(j.nombre)}">
+    ${fecha ? `<p style="color:var(--text-muted); font-family:var(--font-mono); font-size:11px; margin-bottom:8px;">${fecha}</p>` : ''}
+    ${e.nota ? `<p style="color:var(--text-muted); font-size:13px; margin-bottom:14px;">${escapeHtml(e.nota)}</p>` : ''}
+    <div class="modal-actions">
+      <button class="btn btn--ghost btn--sm" style="color:var(--red); border-color:var(--red);" onclick="deleteHistorialEntry(${ji},${ei})">Eliminar imagen</button>
+      <button class="btn btn--ghost btn--sm" onclick="closeModal()">Cerrar</button>
+    </div>
+  `);
+}
+
+async function deleteHistorialEntry(ji, ei){
+  if(!confirm('¿Eliminar esta imagen del historial?')) return;
+  const j = HISTORIAL.jugadores[ji];
+  const e = j.entradas[ei];
+  if(e.path && e.sha) await deleteImageFile(e.path, e.sha);
+  j.entradas.splice(ei, 1);
+  await persist('historial_equipos', HISTORIAL, `Elimina imagen del historial: ${j.nombre}`);
+  renderHistorialAdmin();
   closeModal();
 }
 

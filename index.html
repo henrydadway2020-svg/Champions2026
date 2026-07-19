@@ -22,6 +22,7 @@
       <a href="#meta">Meta</a>
       <a href="#pokedex">Pokédex</a>
       <a href="#equipos">Equipos</a>
+      <a href="#historial">Historial</a>
     </nav>
   </div>
 </header>
@@ -158,6 +159,20 @@
   </div>
 </section>
 
+<section id="historial">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <span class="eyebrow" id="historialEyebrow">Torneo</span>
+        <h2>Historial de equipos</h2>
+      </div>
+      <div class="historial-etapa" id="historialEtapa"></div>
+    </div>
+    <p class="historial-intro" id="historialIntro"></p>
+    <div class="historial-grid" id="historialGrid"></div>
+  </div>
+</section>
+
 <footer>
   <div class="wrap footer-inner">
     <p>Champions Hub · el contenido se administra desde un panel privado y se guarda en GitHub.</p>
@@ -189,6 +204,7 @@ let LIGA_CONFIG = {};
 let LIGA_CALENDARIO = [];
 let LIGA_JUGADORES = [];
 let LIGA_PLAYOFFS = {};
+let HISTORIAL = { torneo:'', etapa:'', jugadores:[] };
 
 let currentTierFmt = 'singles';
 let currentTeamFmt = 'singles';
@@ -213,7 +229,7 @@ async function loadJSONSafe(path, fallback){
 
 async function loadAllData(){
   try{
-    [TORNEOS, TIERS, EQUIPOS, META, POKEDEX_SPECIES, POKEDEX_BUILDS, LIGA_CONFIG, LIGA_CALENDARIO, LIGA_JUGADORES, LIGA_PLAYOFFS] = await Promise.all([
+    [TORNEOS, TIERS, EQUIPOS, META, POKEDEX_SPECIES, POKEDEX_BUILDS, LIGA_CONFIG, LIGA_CALENDARIO, LIGA_JUGADORES, LIGA_PLAYOFFS, HISTORIAL] = await Promise.all([
       loadJSON('data/torneos.json'),
       loadJSON('data/tiers.json'),
       loadJSON('data/equipos.json'),
@@ -223,7 +239,8 @@ async function loadAllData(){
       loadJSON('data/liga_config.json'),
       loadJSON('data/liga_calendario.json'),
       loadJSON('data/liga_jugadores.json'),
-      loadJSONSafe('data/liga_playoffs.json', {})
+      loadJSONSafe('data/liga_playoffs.json', {}),
+      loadJSONSafe('data/historial_equipos.json', { torneo:'', etapa:'', jugadores:[] })
     ]);
   }catch(e){
     console.error(e);
@@ -618,6 +635,62 @@ function renderEquipos(formato){
   `).join("");
 }
 
+/* ------------------------------------------------------------
+   HISTORIAL DE EQUIPOS — galería de imágenes por jugador, se va
+   armando torneo a torneo / ronda a ronda desde el panel admin.
+   ------------------------------------------------------------ */
+function renderHistorial(){
+  const eyebrow = document.getElementById('historialEyebrow');
+  const etapaEl = document.getElementById('historialEtapa');
+  const introEl = document.getElementById('historialIntro');
+  const grid = document.getElementById('historialGrid');
+  const jugadores = (HISTORIAL && HISTORIAL.jugadores) || [];
+
+  if(eyebrow) eyebrow.textContent = (HISTORIAL && HISTORIAL.torneo) || 'Torneo';
+  if(etapaEl) etapaEl.innerHTML = (HISTORIAL && HISTORIAL.etapa) ? `<span class="tag tag--live">● ${escapeHtml(HISTORIAL.etapa)}</span>` : '';
+  if(introEl) introEl.textContent = 'Los equipos que cada jugador fue mostrando ronda a ronda en el bracket.';
+
+  if(!jugadores.length){
+    grid.innerHTML = `<p style="color:var(--text-muted); font-family:var(--font-mono); font-size:13px;">Todavía no hay imágenes cargadas para este torneo.</p>`;
+    return;
+  }
+
+  grid.innerHTML = jugadores.map((j, ji) => {
+    const entradas = j.entradas || [];
+    return `
+      <div class="hud-box historial-card">
+        <div class="historial-card-head">
+          <h3>${escapeHtml(j.nombre)}</h3>
+          <span class="tag">${entradas.length} ${entradas.length===1?'imagen':'imágenes'}</span>
+        </div>
+        <div class="historial-thumbs">
+          ${entradas.map((e,ei) => `
+            <div class="historial-thumb" onclick="openHistorialModal(${ji},${ei})">
+              <img src="${escapeAttr(e.url)}" alt="${escapeAttr(j.nombre)}" loading="lazy">
+              <span class="historial-thumb-tag">${escapeHtml(e.ronda || '—')}</span>
+            </div>
+          `).join('') || `<p class="historial-empty">Sin equipos registrados todavía.</p>`}
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function openHistorialModal(ji, ei){
+  const j = HISTORIAL.jugadores[ji];
+  const e = j.entradas[ei];
+  const fecha = e.fecha ? new Date(e.fecha).toLocaleDateString('es-ES', {year:'numeric', month:'long', day:'numeric'}) : '';
+  openModal(`
+    <h3>${escapeHtml(j.nombre)} — ${escapeHtml(e.ronda || '')}</h3>
+    <img src="${escapeAttr(e.url)}" style="width:100%; border-radius:4px; margin-bottom:14px;" alt="${escapeAttr(j.nombre)}">
+    ${fecha ? `<p style="color:var(--text-muted); font-family:var(--font-mono); font-size:11px; margin-bottom:8px;">${fecha}</p>` : ''}
+    ${e.nota ? `<p style="color:var(--text-muted); font-size:13px; margin-bottom:14px;">${escapeHtml(e.nota)}</p>` : ''}
+    <div class="modal-actions">
+      <button class="btn btn--ghost btn--sm" onclick="closeModal()">Cerrar</button>
+    </div>
+  `);
+}
+
 function renderPokedex(filter){
   filter = (filter || '').trim().toLowerCase();
   const grid = document.getElementById('pokedexGrid');
@@ -712,6 +785,7 @@ document.querySelectorAll('.switch').forEach(sw => {
   renderTierList('singles');
   renderMeta('singles');
   renderEquipos('singles');
+  renderHistorial();
   renderPokedex('');
 })();
 </script>
