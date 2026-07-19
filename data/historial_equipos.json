@@ -95,7 +95,16 @@
     },
     {
       "nombre": "Romanioli",
-      "entradas": []
+      "entradas": [
+        {
+          "url": "https://raw.githubusercontent.com/henrydadway2020-svg/Champions2026/main/data/img/historial/romanioli-1784425006181.jpg",
+          "path": "data/img/historial/romanioli-1784425006181.jpg",
+          "sha": "2eeb86c2d9b684d1771bd7d62f9603f041f12742",
+          "ronda": "Fase de grupos",
+          "nota": "",
+          "fecha": "2026-07-19T01:36:47.084Z"
+        }
+      ]
     },
     {
       "nombre": "Hunter Walls",
