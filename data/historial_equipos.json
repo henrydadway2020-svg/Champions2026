@@ -2,21 +2,78 @@
   "torneo": "GENERAL Victory Road",
   "etapa": "Playoffs",
   "jugadores": [
-    { "nombre": "Gagc", "entradas": [] },
-    { "nombre": "Whitedragons", "entradas": [] },
-    { "nombre": "Akira", "entradas": [] },
-    { "nombre": "Kuki", "entradas": [] },
-    { "nombre": "Gcerbat", "entradas": [] },
-    { "nombre": "Rhoads", "entradas": [] },
-    { "nombre": "ElBoli", "entradas": [] },
-    { "nombre": "Romanioli", "entradas": [] },
-    { "nombre": "Hunter Walls", "entradas": [] },
-    { "nombre": "Juansmo", "entradas": [] },
-    { "nombre": "TheSherman", "entradas": [] },
-    { "nombre": "Berjo", "entradas": [] },
-    { "nombre": "Jefe Tribal", "entradas": [] },
-    { "nombre": "Izmaa", "entradas": [] },
-    { "nombre": "Jhpkm", "entradas": [] },
-    { "nombre": "Sukuna", "entradas": [] }
+    {
+      "nombre": "Gagc",
+      "entradas": [
+        {
+          "url": "https://raw.githubusercontent.com/henrydadway2020-svg/Champions2026/main/data/img/historial/gagc-1784424949073.jpg",
+          "path": "data/img/historial/gagc-1784424949073.jpg",
+          "sha": "38d8fb475db64fb091ec1808ddd3ddb72e479c1c",
+          "ronda": "Fase de grupos",
+          "nota": "",
+          "fecha": "2026-07-19T01:35:50.632Z"
+        }
+      ]
+    },
+    {
+      "nombre": "Whitedragons",
+      "entradas": []
+    },
+    {
+      "nombre": "Akira",
+      "entradas": []
+    },
+    {
+      "nombre": "Kuki",
+      "entradas": []
+    },
+    {
+      "nombre": "Gcerbat",
+      "entradas": []
+    },
+    {
+      "nombre": "Rhoads",
+      "entradas": []
+    },
+    {
+      "nombre": "ElBoli",
+      "entradas": []
+    },
+    {
+      "nombre": "Romanioli",
+      "entradas": []
+    },
+    {
+      "nombre": "Hunter Walls",
+      "entradas": []
+    },
+    {
+      "nombre": "Juansmo",
+      "entradas": []
+    },
+    {
+      "nombre": "TheSherman",
+      "entradas": []
+    },
+    {
+      "nombre": "Berjo",
+      "entradas": []
+    },
+    {
+      "nombre": "Jefe Tribal",
+      "entradas": []
+    },
+    {
+      "nombre": "Izmaa",
+      "entradas": []
+    },
+    {
+      "nombre": "Jhpkm",
+      "entradas": []
+    },
+    {
+      "nombre": "Sukuna",
+      "entradas": []
+    }
   ]
 }
