@@ -108,7 +108,16 @@
     },
     {
       "nombre": "Hunter Walls",
-      "entradas": []
+      "entradas": [
+        {
+          "url": "https://raw.githubusercontent.com/henrydadway2020-svg/Champions2026/main/data/img/historial/hunter-walls-1784425015687.jpg",
+          "path": "data/img/historial/hunter-walls-1784425015687.jpg",
+          "sha": "f50a52f97ce75019fe40ec5f4b7a5c5a401e635c",
+          "ronda": "Fase de grupos",
+          "nota": "",
+          "fecha": "2026-07-19T01:36:56.544Z"
+        }
+      ]
     },
     {
       "nombre": "Juansmo",
