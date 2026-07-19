@@ -17,7 +17,16 @@
     },
     {
       "nombre": "Whitedragons",
-      "entradas": []
+      "entradas": [
+        {
+          "url": "https://raw.githubusercontent.com/henrydadway2020-svg/Champions2026/main/data/img/historial/whitedragons-1784424958731.jpg",
+          "path": "data/img/historial/whitedragons-1784424958731.jpg",
+          "sha": "8a77e045a7c7dd8874b30dfb342821fb6743a3df",
+          "ronda": "Fase de grupos",
+          "nota": "",
+          "fecha": "2026-07-19T01:35:59.592Z"
+        }
+      ]
     },
     {
       "nombre": "Akira",
