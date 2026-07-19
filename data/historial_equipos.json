@@ -186,7 +186,16 @@
     },
     {
       "nombre": "Jhpkm",
-      "entradas": []
+      "entradas": [
+        {
+          "url": "https://raw.githubusercontent.com/henrydadway2020-svg/Champions2026/main/data/img/historial/jhpkm-1784425068823.jpg",
+          "path": "data/img/historial/jhpkm-1784425068823.jpg",
+          "sha": "edda271bb3068b0d5283e446c252bbbd74afd4a9",
+          "ronda": "Fase de grupos",
+          "nota": "",
+          "fecha": "2026-07-19T01:37:49.737Z"
+        }
+      ]
     },
     {
       "nombre": "Sukuna",
