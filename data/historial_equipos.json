@@ -147,7 +147,16 @@
     },
     {
       "nombre": "Berjo",
-      "entradas": []
+      "entradas": [
+        {
+          "url": "https://raw.githubusercontent.com/henrydadway2020-svg/Champions2026/main/data/img/historial/berjo-1784425042593.jpg",
+          "path": "data/img/historial/berjo-1784425042593.jpg",
+          "sha": "2a83dfa7f9223ab89e234893b86a890fb71e102a",
+          "ronda": "Fase de grupos",
+          "nota": "",
+          "fecha": "2026-07-19T01:37:23.569Z"
+        }
+      ]
     },
     {
       "nombre": "Jefe Tribal",
