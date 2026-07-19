@@ -121,7 +121,16 @@
     },
     {
       "nombre": "Juansmo",
-      "entradas": []
+      "entradas": [
+        {
+          "url": "https://raw.githubusercontent.com/henrydadway2020-svg/Champions2026/main/data/img/historial/juansmo-1784425026006.jpg",
+          "path": "data/img/historial/juansmo-1784425026006.jpg",
+          "sha": "0d449c15ccbcdc933e396c5f761cc4732e9dac2b",
+          "ronda": "Fase de grupos",
+          "nota": "",
+          "fecha": "2026-07-19T01:37:06.901Z"
+        }
+      ]
     },
     {
       "nombre": "TheSherman",
