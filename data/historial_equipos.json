@@ -30,7 +30,16 @@
     },
     {
       "nombre": "Akira",
-      "entradas": []
+      "entradas": [
+        {
+          "url": "https://raw.githubusercontent.com/henrydadway2020-svg/Champions2026/main/data/img/historial/akira-1784424966470.jpg",
+          "path": "data/img/historial/akira-1784424966470.jpg",
+          "sha": "2613661270e84f43d9213ccca17024d9caba4ed6",
+          "ronda": "Fase de grupos",
+          "nota": "",
+          "fecha": "2026-07-19T01:36:07.318Z"
+        }
+      ]
     },
     {
       "nombre": "Kuki",
