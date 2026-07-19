@@ -56,7 +56,16 @@
     },
     {
       "nombre": "Gcerbat",
-      "entradas": []
+      "entradas": [
+        {
+          "url": "https://raw.githubusercontent.com/henrydadway2020-svg/Champions2026/main/data/img/historial/gcerbat-1784424981965.jpg",
+          "path": "data/img/historial/gcerbat-1784424981965.jpg",
+          "sha": "b39f13b4242a9e21f64a42c6ad68e0531cb9cdbb",
+          "ronda": "Fase de grupos",
+          "nota": "",
+          "fecha": "2026-07-19T01:36:22.822Z"
+        }
+      ]
     },
     {
       "nombre": "Rhoads",
