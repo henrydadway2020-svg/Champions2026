@@ -173,7 +173,16 @@
     },
     {
       "nombre": "Izmaa",
-      "entradas": []
+      "entradas": [
+        {
+          "url": "https://raw.githubusercontent.com/henrydadway2020-svg/Champions2026/main/data/img/historial/izmaa-1784425060847.jpg",
+          "path": "data/img/historial/izmaa-1784425060847.jpg",
+          "sha": "cbac799e9cdf9a52f564ce1a099bb033877501c1",
+          "ronda": "Fase de grupos",
+          "nota": "",
+          "fecha": "2026-07-19T01:37:41.749Z"
+        }
+      ]
     },
     {
       "nombre": "Jhpkm",
