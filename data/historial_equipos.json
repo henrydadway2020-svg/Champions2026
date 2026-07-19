@@ -69,7 +69,16 @@
     },
     {
       "nombre": "Rhoads",
-      "entradas": []
+      "entradas": [
+        {
+          "url": "https://raw.githubusercontent.com/henrydadway2020-svg/Champions2026/main/data/img/historial/rhoads-1784424990467.jpg",
+          "path": "data/img/historial/rhoads-1784424990467.jpg",
+          "sha": "b6e8048908a3dbb91df3df01549a16abe9b63ece",
+          "ronda": "Fase de grupos",
+          "nota": "",
+          "fecha": "2026-07-19T01:36:31.432Z"
+        }
+      ]
     },
     {
       "nombre": "ElBoli",
