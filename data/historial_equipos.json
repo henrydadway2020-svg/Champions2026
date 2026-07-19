@@ -43,7 +43,16 @@
     },
     {
       "nombre": "Kuki",
-      "entradas": []
+      "entradas": [
+        {
+          "url": "https://raw.githubusercontent.com/henrydadway2020-svg/Champions2026/main/data/img/historial/kuki-1784424974670.jpg",
+          "path": "data/img/historial/kuki-1784424974670.jpg",
+          "sha": "f9333d100414c1e9fd8c9c6e7d4caabdb9df8485",
+          "ronda": "Fase de grupos",
+          "nota": "",
+          "fecha": "2026-07-19T01:36:15.527Z"
+        }
+      ]
     },
     {
       "nombre": "Gcerbat",
