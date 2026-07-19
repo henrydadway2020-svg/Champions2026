@@ -134,7 +134,16 @@
     },
     {
       "nombre": "TheSherman",
-      "entradas": []
+      "entradas": [
+        {
+          "url": "https://raw.githubusercontent.com/henrydadway2020-svg/Champions2026/main/data/img/historial/thesherman-1784425035462.jpg",
+          "path": "data/img/historial/thesherman-1784425035462.jpg",
+          "sha": "d3c4641c0ca6f0bd1a11c6b76d2726aa7bcca799",
+          "ronda": "Fase de grupos",
+          "nota": "",
+          "fecha": "2026-07-19T01:37:16.322Z"
+        }
+      ]
     },
     {
       "nombre": "Berjo",
