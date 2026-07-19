@@ -160,7 +160,16 @@
     },
     {
       "nombre": "Jefe Tribal",
-      "entradas": []
+      "entradas": [
+        {
+          "url": "https://raw.githubusercontent.com/henrydadway2020-svg/Champions2026/main/data/img/historial/jefe-tribal-1784425053804.jpg",
+          "path": "data/img/historial/jefe-tribal-1784425053804.jpg",
+          "sha": "d6691fb9280090d605c189310b172bacdf449b72",
+          "ronda": "Fase de grupos",
+          "nota": "",
+          "fecha": "2026-07-19T01:37:34.734Z"
+        }
+      ]
     },
     {
       "nombre": "Izmaa",
