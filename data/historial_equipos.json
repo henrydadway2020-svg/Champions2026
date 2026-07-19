@@ -1,0 +1,22 @@
+{
+  "torneo": "GENERAL Victory Road",
+  "etapa": "Playoffs",
+  "jugadores": [
+    { "nombre": "Gagc", "entradas": [] },
+    { "nombre": "Whitedragons", "entradas": [] },
+    { "nombre": "Akira", "entradas": [] },
+    { "nombre": "Kuki", "entradas": [] },
+    { "nombre": "Gcerbat", "entradas": [] },
+    { "nombre": "Rhoads", "entradas": [] },
+    { "nombre": "ElBoli", "entradas": [] },
+    { "nombre": "Romanioli", "entradas": [] },
+    { "nombre": "Hunter Walls", "entradas": [] },
+    { "nombre": "Juansmo", "entradas": [] },
+    { "nombre": "TheSherman", "entradas": [] },
+    { "nombre": "Berjo", "entradas": [] },
+    { "nombre": "Jefe Tribal", "entradas": [] },
+    { "nombre": "Izmaa", "entradas": [] },
+    { "nombre": "Jhpkm", "entradas": [] },
+    { "nombre": "Sukuna", "entradas": [] }
+  ]
+}
