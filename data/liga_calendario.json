@@ -481,7 +481,10 @@
         "id": 50,
         "jugadorA": "Sukuna",
         "jugadorB": "RedWarrior",
-        "resultado": null
+        "resultado": {
+          "ganador": "Sukuna",
+          "marcador": "2-0"
+        }
       },
       {
         "id": 51,
