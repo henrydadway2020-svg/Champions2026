@@ -393,14 +393,27 @@ function renderLigaFecha(numFecha){
         <option value="">Sin jugar</option>
         <option value="${escapeAttr(p.jugadorA)}" ${p.resultado && p.resultado.ganador === p.jugadorA ? 'selected' : ''}>Gana ${escapeHtml(p.jugadorA)}</option>
         <option value="${escapeAttr(p.jugadorB)}" ${p.resultado && p.resultado.ganador === p.jugadorB ? 'selected' : ''}>Gana ${escapeHtml(p.jugadorB)}</option>
+        <option value="EMPATE" ${p.resultado && p.resultado.empate ? 'selected' : ''}>Empate 0-0 (no se jugó)</option>
       </select>
       <input id="lgMarcador_${p.id}" placeholder="Ej. 2-1" value="${escapeAttr(p.resultado ? p.resultado.marcador : '')}">
     </div>
   `).join('') + `
-    <div class="modal-actions" style="justify-content:flex-start; margin-top:14px;">
+    <div class="modal-actions" style="justify-content:flex-start; margin-top:14px; gap:10px;">
       <button class="btn btn--primary btn--sm" onclick="guardarFechaLiga(${numFecha})">Guardar Fecha ${numFecha}</button>
+      <button class="btn btn--sm" onclick="marcarPendientesComoEmpate(${numFecha})">Marcar pendientes como empate 0-0</button>
     </div>
   `;
+}
+
+async function marcarPendientesComoEmpate(numFecha){
+  const f = LIGA_CALENDARIO.find(x => x.fecha === numFecha);
+  if(!f) return;
+  const pendientes = f.partidos.filter(p => !p.resultado);
+  if(!pendientes.length){ alert('Todos los partidos de esta fecha ya tienen resultado.'); return; }
+  if(!confirm(`Esto marcará ${pendientes.length} partido(s) sin jugar de la Fecha ${numFecha} como empate 0-0. ¿Continuar?`)) return;
+  pendientes.forEach(p => { p.resultado = { ganador: null, marcador: '0-0', empate: true }; });
+  await persist('liga_calendario', LIGA_CALENDARIO, `Marca empates 0-0 pendientes — Fecha ${numFecha}`);
+  renderLigaAdmin();
 }
 
 async function guardarFechaLiga(numFecha){
@@ -408,8 +421,14 @@ async function guardarFechaLiga(numFecha){
   if(!f) return;
   f.partidos.forEach(p => {
     const ganador = document.getElementById(`lgGanador_${p.id}`).value;
-    const marcador = document.getElementById(`lgMarcador_${p.id}`).value.trim();
-    p.resultado = ganador ? { ganador, marcador } : null;
+    const marcadorInput = document.getElementById(`lgMarcador_${p.id}`).value.trim();
+    if(ganador === 'EMPATE'){
+      p.resultado = { ganador: null, marcador: '0-0', empate: true };
+    } else if(ganador){
+      p.resultado = { ganador, marcador: marcadorInput };
+    } else {
+      p.resultado = null;
+    }
   });
   await persist('liga_calendario', LIGA_CALENDARIO, `Actualiza resultados Fecha ${numFecha}`);
   renderLigaAdmin();
@@ -429,11 +448,17 @@ function computeStandings(){
     if(p.jugadorB) nombres.add(p.jugadorB);
   }));
 
+  const puntosCfg = (LIGA_CONFIG && LIGA_CONFIG.puntos) || { victoria: 3, empate: 1, derrota: 0 };
   const stats = {};
-  nombres.forEach(n => { if(n) stats[n] = { nombre:n, pj:0, pg:0, pp:0 }; });
+  nombres.forEach(n => { if(n) stats[n] = { nombre:n, pj:0, pg:0, pe:0, pp:0 }; });
 
   (LIGA_CALENDARIO || []).forEach(f => (f.partidos || []).forEach(p => {
     if(!p.resultado) return;
+    if(p.resultado.empate || !p.resultado.ganador){
+      if(stats[p.jugadorA]){ stats[p.jugadorA].pj++; stats[p.jugadorA].pe++; }
+      if(stats[p.jugadorB]){ stats[p.jugadorB].pj++; stats[p.jugadorB].pe++; }
+      return;
+    }
     const ganador = p.resultado.ganador;
     const perdedor = ganador === p.jugadorA ? p.jugadorB : p.jugadorA;
     if(stats[ganador]){ stats[ganador].pj++; stats[ganador].pg++; }
@@ -441,8 +466,12 @@ function computeStandings(){
   }));
 
   return Object.values(stats)
-    .map(s => ({ ...s, pct: s.pj ? Math.round((s.pg / s.pj) * 1000) / 10 : 0 }))
-    .sort((a, b) => b.pg - a.pg || b.pct - a.pct || a.pp - b.pp || a.nombre.localeCompare(b.nombre));
+    .map(s => ({
+      ...s,
+      pts: s.pg * puntosCfg.victoria + s.pe * (puntosCfg.empate || 0) + s.pp * puntosCfg.derrota,
+      pct: s.pj ? Math.round((s.pg / s.pj) * 1000) / 10 : 0,
+    }))
+    .sort((a, b) => b.pts - a.pts || b.pg - a.pg || b.pct - a.pct || a.pp - b.pp || a.nombre.localeCompare(b.nombre));
 }
 
 function ligaEstaCompleta(){
@@ -457,11 +486,11 @@ function standingsTableHtml(standings){
     <div class="standings-wrap" style="margin-bottom:24px;">
       <div class="standings-scroll">
         <table class="standings-table">
-          <thead><tr><th>#</th><th>Jugador</th><th>PJ</th><th>PG</th><th>PP</th><th>%</th></tr></thead>
+          <thead><tr><th>#</th><th>Jugador</th><th>PJ</th><th>PG</th><th>PE</th><th>PP</th><th>Pts</th><th>%</th></tr></thead>
           <tbody>
             ${standings.map((s, i) => `
               <tr class="${i < 4 ? 'is-qualified' : ''}">
-                <td>${i + 1}</td><td>${escapeHtml(s.nombre)}</td><td>${s.pj}</td><td>${s.pg}</td><td>${s.pp}</td><td>${s.pct}%</td>
+                <td>${i + 1}</td><td>${escapeHtml(s.nombre)}</td><td>${s.pj}</td><td>${s.pg}</td><td>${s.pe}</td><td>${s.pp}</td><td>${s.pts}</td><td>${s.pct}%</td>
               </tr>
             `).join('')}
           </tbody>

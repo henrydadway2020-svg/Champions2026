@@ -350,7 +350,10 @@ function renderLiga(){
                 <span class="${p.resultado && p.resultado.ganador === p.jugadorB ? 'partido-ganador' : ''}">${escapeHtml(p.jugadorB)}</span>
               </div>
               <div class="partido-resultado">
-                ${p.resultado ? `<b>${escapeHtml(p.resultado.ganador)}</b> gana ${escapeHtml(p.resultado.marcador || '')}` : '<span class="partido-pendiente">Pendiente</span>'}
+                ${p.resultado ? (p.resultado.empate || !p.resultado.ganador
+                  ? '<span class="partido-empate">Empate 0-0</span>'
+                  : `<b>${escapeHtml(p.resultado.ganador)}</b> gana ${escapeHtml(p.resultado.marcador || '')}`)
+                  : '<span class="partido-pendiente">Pendiente</span>'}
               </div>
             </div>
           `).join('')}
@@ -374,11 +377,17 @@ function computeStandings(){
     if(p.jugadorB) nombres.add(p.jugadorB);
   }));
 
+  const puntosCfg = (LIGA_CONFIG && LIGA_CONFIG.puntos) || { victoria: 3, empate: 1, derrota: 0 };
   const stats = {};
-  nombres.forEach(n => { if(n) stats[n] = { nombre:n, pj:0, pg:0, pp:0 }; });
+  nombres.forEach(n => { if(n) stats[n] = { nombre:n, pj:0, pg:0, pe:0, pp:0 }; });
 
   (LIGA_CALENDARIO || []).forEach(f => (f.partidos || []).forEach(p => {
     if(!p.resultado) return;
+    if(p.resultado.empate || !p.resultado.ganador){
+      if(stats[p.jugadorA]){ stats[p.jugadorA].pj++; stats[p.jugadorA].pe++; }
+      if(stats[p.jugadorB]){ stats[p.jugadorB].pj++; stats[p.jugadorB].pe++; }
+      return;
+    }
     const ganador = p.resultado.ganador;
     const perdedor = ganador === p.jugadorA ? p.jugadorB : p.jugadorA;
     if(stats[ganador]){ stats[ganador].pj++; stats[ganador].pg++; }
@@ -386,8 +395,12 @@ function computeStandings(){
   }));
 
   return Object.values(stats)
-    .map(s => ({ ...s, pct: s.pj ? Math.round((s.pg / s.pj) * 1000) / 10 : 0 }))
-    .sort((a, b) => b.pg - a.pg || b.pct - a.pct || a.pp - b.pp || a.nombre.localeCompare(b.nombre));
+    .map(s => ({
+      ...s,
+      pts: s.pg * puntosCfg.victoria + s.pe * (puntosCfg.empate || 0) + s.pp * puntosCfg.derrota,
+      pct: s.pj ? Math.round((s.pg / s.pj) * 1000) / 10 : 0,
+    }))
+    .sort((a, b) => b.pts - a.pts || b.pg - a.pg || b.pct - a.pct || a.pp - b.pp || a.nombre.localeCompare(b.nombre));
 }
 
 function ligaEstaCompleta(){
@@ -409,7 +422,7 @@ function renderStandings(){
     <div class="standings-scroll">
       <table class="standings-table">
         <thead>
-          <tr><th>#</th><th>Jugador</th><th>PJ</th><th>PG</th><th>PP</th><th>%</th></tr>
+          <tr><th>#</th><th>Jugador</th><th>PJ</th><th>PG</th><th>PE</th><th>PP</th><th>Pts</th><th>%</th></tr>
         </thead>
         <tbody>
           ${standings.map((s, i) => `
@@ -418,7 +431,9 @@ function renderStandings(){
               <td>${escapeHtml(s.nombre)}${i < 4 ? ' <span class="tag tag--live">Playoffs</span>' : ''}</td>
               <td>${s.pj}</td>
               <td>${s.pg}</td>
+              <td>${s.pe}</td>
               <td>${s.pp}</td>
+              <td>${s.pts}</td>
               <td>${s.pct}%</td>
             </tr>
           `).join('')}
