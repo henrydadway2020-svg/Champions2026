@@ -571,7 +571,10 @@
         "id": 62,
         "jugadorA": "Vivi1600",
         "jugadorB": "Lelouch",
-        "resultado": null
+        "resultado": {
+          "ganador": "Lelouch",
+          "marcador": "2-0"
+        }
       },
       {
         "id": 63,
