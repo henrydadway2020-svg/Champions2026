@@ -508,7 +508,10 @@
         "id": 54,
         "jugadorA": "Bryvil",
         "jugadorB": "Skaires",
-        "resultado": null
+        "resultado": {
+          "ganador": "Skaires",
+          "marcador": "2-0"
+        }
       },
       {
         "id": 55,
