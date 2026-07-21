@@ -520,7 +520,10 @@
         "id": 56,
         "jugadorA": "GAGC",
         "jugadorB": "Ekko",
-        "resultado": null
+        "resultado": {
+          "ganador": "GAGC",
+          "marcador": "2-1"
+        }
       }
     ]
   },
