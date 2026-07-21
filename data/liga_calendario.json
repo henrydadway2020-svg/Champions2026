@@ -475,13 +475,21 @@
         "id": 49,
         "jugadorA": "Omega",
         "jugadorB": "RoninMx",
-        "resultado": null
+        "resultado": {
+          "ganador": null,
+          "marcador": "0-0",
+          "empate": true
+        }
       },
       {
         "id": 50,
         "jugadorA": "Sukuna",
         "jugadorB": "RedWarrior",
-        "resultado": null
+        "resultado": {
+          "ganador": null,
+          "marcador": "0-0",
+          "empate": true
+        }
       },
       {
         "id": 51,
@@ -496,7 +504,11 @@
         "id": 52,
         "jugadorA": "Jhpkm",
         "jugadorB": "Gush",
-        "resultado": null
+        "resultado": {
+          "ganador": null,
+          "marcador": "0-0",
+          "empate": true
+        }
       },
       {
         "id": 53,
@@ -520,7 +532,11 @@
         "id": 55,
         "jugadorA": "JOS896",
         "jugadorB": "Lelouch",
-        "resultado": null
+        "resultado": {
+          "ganador": null,
+          "marcador": "0-0",
+          "empate": true
+        }
       },
       {
         "id": 56,
