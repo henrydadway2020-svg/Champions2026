@@ -584,7 +584,10 @@
         "id": 61,
         "jugadorA": "Jhpkm",
         "jugadorB": "Skaires",
-        "resultado": null
+        "resultado": {
+          "ganador": "Jhpkm",
+          "marcador": "2-0"
+        }
       },
       {
         "id": 62,
