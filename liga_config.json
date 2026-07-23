@@ -9,6 +9,7 @@
   "estado": "en_curso",
   "puntos": {
     "victoria": 3,
+    "empate": 0,
     "derrota": 0
   },
   "desempate": [
