@@ -556,13 +556,20 @@
         "id": 57,
         "jugadorA": "Omega",
         "jugadorB": "RedWarrior",
-        "resultado": null
+        "resultado": {
+          "ganador": null,
+          "marcador": "0-0",
+          "empate": true
+        }
       },
       {
         "id": 58,
         "jugadorA": "RoninMx",
         "jugadorB": "Elbolas",
-        "resultado": null
+        "resultado": {
+          "ganador": "Elbolas",
+          "marcador": "2-0"
+        }
       },
       {
         "id": 59,
@@ -613,7 +620,10 @@
         "id": 64,
         "jugadorA": "JOS896",
         "jugadorB": "GAGC",
-        "resultado": null
+        "resultado": {
+          "ganador": "GAGC",
+          "marcador": "2-0"
+        }
       }
     ]
   },
