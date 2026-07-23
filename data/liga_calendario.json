@@ -635,7 +635,10 @@
         "id": 65,
         "jugadorA": "Omega",
         "jugadorB": "Elbolas",
-        "resultado": null
+        "resultado": {
+          "ganador": "Elbolas",
+          "marcador": "2-0"
+        }
       },
       {
         "id": 66,
