@@ -504,9 +504,8 @@
         "jugadorA": "Jhpkm",
         "jugadorB": "Gush",
         "resultado": {
-          "ganador": null,
-          "marcador": "0-0",
-          "empate": true
+          "ganador": "Gush",
+          "marcador": "2.0"
         }
       },
       {
