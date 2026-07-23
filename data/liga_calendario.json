@@ -731,7 +731,10 @@
         "id": 79,
         "jugadorA": "Jhpkm",
         "jugadorB": "JOS896",
-        "resultado": null
+        "resultado": {
+          "ganador": "Jhpkm",
+          "marcador": "2-0"
+        }
       },
       {
         "id": 80,
