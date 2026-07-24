@@ -685,7 +685,10 @@
         "id": 72,
         "jugadorA": "Bryvil",
         "jugadorB": "JOS896",
-        "resultado": null
+        "resultado": {
+          "ganador": "Bryvil",
+          "marcador": "2-0"
+        }
       }
     ]
   },
