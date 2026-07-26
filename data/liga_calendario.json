@@ -817,7 +817,10 @@
         "id": 88,
         "jugadorA": "Jhpkm",
         "jugadorB": "Vivi1600",
-        "resultado": null
+        "resultado": {
+          "ganador": "Jhpkm",
+          "marcador": "2-0"
+        }
       }
     ]
   },
