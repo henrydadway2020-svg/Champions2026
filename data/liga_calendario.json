@@ -760,7 +760,10 @@
         "id": 80,
         "jugadorA": "Vivi1600",
         "jugadorB": "Bryvil",
-        "resultado": null
+        "resultado": {
+          "ganador": "Bryvil",
+          "marcador": "2-0"
+        }
       }
     ]
   },
