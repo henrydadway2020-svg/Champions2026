@@ -919,7 +919,10 @@
         "id": 102,
         "jugadorA": "RedWarrior",
         "jugadorB": "Vivi1600",
-        "resultado": null
+        "resultado": {
+          "ganador": "RedWarrior",
+          "marcador": "2-0"
+        }
       },
       {
         "id": 103,
