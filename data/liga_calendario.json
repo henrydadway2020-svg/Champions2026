@@ -868,7 +868,10 @@
         "id": 95,
         "jugadorA": "Sukuna",
         "jugadorB": "Vivi1600",
-        "resultado": null
+        "resultado": {
+          "ganador": "Sukuna",
+          "marcador": "2-0"
+        }
       },
       {
         "id": 96,
