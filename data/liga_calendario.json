@@ -643,7 +643,11 @@
         "id": 66,
         "jugadorA": "RedWarrior",
         "jugadorB": "Gush",
-        "resultado": null
+        "resultado": {
+          "ganador": null,
+          "marcador": "0-0",
+          "empate": true
+        }
       },
       {
         "id": 67,
@@ -658,7 +662,10 @@
         "id": 68,
         "jugadorA": "Sukuna",
         "jugadorB": "Skaires",
-        "resultado": null
+        "resultado": {
+          "ganador": "Sukuna",
+          "marcador": "2-0"
+        }
       },
       {
         "id": 69,
