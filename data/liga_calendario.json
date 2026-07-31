@@ -902,7 +902,10 @@
         "id": 94,
         "jugadorA": "RoninMx",
         "jugadorB": "Bryvil",
-        "resultado": null
+        "resultado": {
+          "ganador": "Bryvil",
+          "marcador": "2-0"
+        }
       },
       {
         "id": 95,
