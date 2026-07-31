@@ -836,7 +836,10 @@
         "id": 87,
         "jugadorA": "Akira",
         "jugadorB": "Bryvil",
-        "resultado": null
+        "resultado": {
+          "ganador": "Akira",
+          "marcador": "2-1"
+        }
       },
       {
         "id": 88,
