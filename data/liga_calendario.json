@@ -791,13 +791,19 @@
         "id": 81,
         "jugadorA": "Omega",
         "jugadorB": "Vik",
-        "resultado": null
+        "resultado": {
+          "ganador": "Vik",
+          "marcador": "2-0"
+        }
       },
       {
         "id": 82,
         "jugadorA": "Gush",
         "jugadorB": "Skaires",
-        "resultado": null
+        "resultado": {
+          "ganador": "Gush",
+          "marcador": "2-0"
+        }
       },
       {
         "id": 83,
@@ -812,7 +818,10 @@
         "id": 84,
         "jugadorA": "RedWarrior",
         "jugadorB": "Ekko",
-        "resultado": null
+        "resultado": {
+          "ganador": "Ekko",
+          "marcador": "2-0"
+        }
       },
       {
         "id": 85,
