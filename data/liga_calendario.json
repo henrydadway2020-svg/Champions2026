@@ -881,10 +881,7 @@
         "id": 91,
         "jugadorA": "Gush",
         "jugadorB": "Ekko",
-        "resultado": {
-          "ganador": "Ekko",
-          "marcador": "2-0"
-        }
+        "resultado": null
       },
       {
         "id": 92,
