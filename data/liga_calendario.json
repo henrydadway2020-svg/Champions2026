@@ -984,9 +984,8 @@
         "jugadorA": "Elbolas",
         "jugadorB": "Bryvil",
         "resultado": {
-          "ganador": null,
-          "marcador": "0-0",
-          "empate": true
+          "ganador": "Elbolas",
+          "marcador": "2-0"
         }
       },
       {
