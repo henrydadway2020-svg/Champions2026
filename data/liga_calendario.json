@@ -1027,25 +1027,40 @@
         "id": 105,
         "jugadorA": "Omega",
         "jugadorB": "Ekko",
-        "resultado": null
+        "resultado": {
+          "ganador": "Ekko",
+          "marcador": "2-0"
+        }
       },
       {
         "id": 106,
         "jugadorA": "Lelouch",
         "jugadorB": "GAGC",
-        "resultado": null
+        "resultado": {
+          "ganador": null,
+          "marcador": "0-0",
+          "empate": true
+        }
       },
       {
         "id": 107,
         "jugadorA": "Skaires",
         "jugadorB": "JOS896",
-        "resultado": null
+        "resultado": {
+          "ganador": null,
+          "marcador": "0-0",
+          "empate": true
+        }
       },
       {
         "id": 108,
         "jugadorA": "Vik",
         "jugadorB": "Bryvil",
-        "resultado": null
+        "resultado": {
+          "ganador": null,
+          "marcador": "0-0",
+          "empate": true
+        }
       },
       {
         "id": 109,
@@ -1060,19 +1075,29 @@
         "id": 110,
         "jugadorA": "Elbolas",
         "jugadorB": "Jhpkm",
-        "resultado": null
+        "resultado": {
+          "ganador": null,
+          "marcador": "0-0",
+          "empate": true
+        }
       },
       {
         "id": 111,
         "jugadorA": "RedWarrior",
         "jugadorB": "Akira",
-        "resultado": null
+        "resultado": {
+          "ganador": "Akira",
+          "marcador": "2-0"
+        }
       },
       {
         "id": 112,
         "jugadorA": "RoninMx",
         "jugadorB": "Sukuna",
-        "resultado": null
+        "resultado": {
+          "ganador": "Sukuna",
+          "marcador": "2-0"
+        }
       }
     ]
   },
