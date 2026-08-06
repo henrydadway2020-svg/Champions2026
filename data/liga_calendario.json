@@ -1094,8 +1094,9 @@
         "jugadorA": "RoninMx",
         "jugadorB": "Sukuna",
         "resultado": {
-          "ganador": "Sukuna",
-          "marcador": "2-0"
+          "ganador": null,
+          "marcador": "0-0",
+          "empate": true
         }
       }
     ]
