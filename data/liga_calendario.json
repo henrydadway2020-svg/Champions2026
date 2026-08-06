@@ -1012,9 +1012,8 @@
         "jugadorA": "Sukuna",
         "jugadorB": "Akira",
         "resultado": {
-          "ganador": null,
-          "marcador": "0-0",
-          "empate": true
+          "ganador": "Sukuna",
+          "marcador": "2-0"
         }
       }
     ]
